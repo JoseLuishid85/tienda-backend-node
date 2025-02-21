@@ -1,7 +1,8 @@
 const { Sequelize } = require('sequelize');
+require('dotenv').config();
 
-const sequelize = new Sequelize('joseluish_tienda', 'joseluish_user', '51t)4!d?[%u&', {
-    host: '',
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
+    host: process.env.DB_HOST,
     dialect: 'mysql',
     logging: false, // Evita que muestre logs en consola
 });
