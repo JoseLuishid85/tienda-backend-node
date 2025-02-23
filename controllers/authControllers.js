@@ -28,12 +28,12 @@ const loginUsuario = async (req, res) => {
     }
 
     // Generar un token JWT
-    const token = await generarJWT(usuario.id);
+    //const token = await generarJWT(usuario.id);
 
     res.json({
       msg: 'Inicio de sesión exitoso',
       usuario,
-      token: token,
+      token: "bien",
     });
   } catch (error) {
     console.error(error);
