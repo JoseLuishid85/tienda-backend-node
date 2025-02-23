@@ -9,15 +9,15 @@ const loginUsuario = async (req, res) => {
   try {
     const usuario = await Usuario.findOne({ where: { email } });
 
+    if (!usuario) {
+        return res.status(401).json({
+          msg: 'Credenciales inválidas',
+        });
+      }
+
     if (usuario.estado === false) {
       res.status(401).json({ data: undefined, msg: 'Su cuenta esta Desactiva' });
       return;
-    }
-
-    if (!usuario) {
-      return res.status(401).json({
-        msg: 'Credenciales inválidas',
-      });
     }
 
     const passwordMatch = await bcrypt.compare(password, usuario.password);
@@ -28,12 +28,12 @@ const loginUsuario = async (req, res) => {
     }
 
     // Generar un token JWT
-    //const token = await generarJWT(usuario.id);
+    const token = await generarJWT(usuario.id);
 
     res.json({
       msg: 'Inicio de sesión exitoso',
       usuario,
-      token: "bien",
+      token: token,
     });
   } catch (error) {
     console.error(error);
