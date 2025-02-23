@@ -5,9 +5,9 @@ const sequelize = require('./config/database');
 require('dotenv').config();
 app.use(express.json());
 
-sequelize.sync({ force: false })
+sequelize.sync({ alter: true })
     .then(() => {
-        console.log('Base de datos sincronizada.');
+        console.log('Base de datos sincronizada dd.');
     })
     .catch(err => console.error('Error al sincronizar la BD:', err));
 
