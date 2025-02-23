@@ -5,7 +5,7 @@ const sequelize = require('./config/database');
 require('dotenv').config();
 app.use(express.json());
 
-sequelize.sync({ alter: true })
+sequelize.sync({ force: false })
     .then(() => {
         console.log('Base de datos sincronizada dd.');
     })
@@ -13,6 +13,7 @@ sequelize.sync({ alter: true })
 
 app.use('/store/api/login', require('./routes/authRouter.js'));
 app.use('/store/api/usuario', require('./routes/usuario'));
+app.use('/store/api/categoria', require('./routes/categoriaRouter.js'));
 
 const PORT = 4000;
  
