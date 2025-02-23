@@ -1,12 +1,15 @@
 const express = require('express');
-const router = express.Router();
-const {  getUsuarios, getUsuario, postUsuarioAdmin, putUsuario, deleteUsuario } = require('../controllers/usuarioController.js');
+const validarJWT = require('../middlewares/validar-token.js');
+const {  postUsuarioAdmin, getUsuarioAdmin, getUsuariosAdmin, updateUsuarioAdmin, cambiarEstadoAdmin } = require('../controllers/usuarioController.js');
 
-router.get('/', getUsuarios);
-router.post('/',  postUsuarioAdmin);
-router.get('/:id', getUsuario);
-router.put('/:id', putUsuario);
-router.delete('/:id', deleteUsuario);
+const routes = express.Router();
 
 
-module.exports = router;
+routes.post('/', validarJWT,  postUsuarioAdmin);
+routes.get('/', validarJWT,  getUsuariosAdmin);
+routes.get('/:id', validarJWT , getUsuarioAdmin);
+routes.put('/:id', validarJWT , updateUsuarioAdmin);
+routes.put('/cambiar_estado/:id', validarJWT , cambiarEstadoAdmin);
+
+
+module.exports = routes;

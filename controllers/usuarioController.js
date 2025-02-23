@@ -1,32 +1,9 @@
 const Usuario = require("../models/Usuario");
 const bcrypt = require('bcrypt');
 
-const getUsuarios = async (req, res) => {
-    try {
-        const usuarios = await Usuario.findAll();
-        res.status(200).json(usuarios);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-}
-
-const getUsuario = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const usuario = await Usuario.findByPk(id);
-        
-        if (!usuario) {
-            return res.status(404).json({ msg: "Usuario no encontrado" });
-        }
-
-        res.status(200).json(usuario);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-}
 
 const postUsuarioAdmin = async (req, res) => {
-    /*
+
     if (!req.usuario) {
         res.status(500).json({
             data: undefined,
@@ -34,76 +11,183 @@ const postUsuarioAdmin = async (req, res) => {
             dd: req.usuario
         });
         return
-    }*/
+    }
 
-        const usuario = req.body; 
+    const usuario = req.body;
 
-        try {
-            await Usuario.sync();
-    
-            const emailExists = await Usuario.findOne({ where: { email: usuario.email } });
-            if (emailExists) {
-                return res.status(404).json({
-                    msg: 'El correo electrónico ya está en uso',
-                });
-            }
-    
-            // Hash de la contraseña antes de almacenarla en la base de datos
-            const hashedPassword = await bcrypt.hash(usuario.password, 10);
-    
-            const newUsuario = await Usuario.create({
-                ...usuario,
-                password: hashedPassword,
-            });
-    
-            res.json({
-                msg: "Usuario agregado con exito",
-                usuario: newUsuario
-            })
-        } catch (error) {
-            res.status(500).json({
-                msg: "Error al procesar datos"
-            });
-            console.log(error);
-        }
-}
-
-const putUsuario = async (req, res) => {
     try {
-        const { id } = req.params;
-        const usuario = await Usuario.findByPk(id);
+        await Usuario.sync();
 
-        if (!usuario) {
-            return res.status(404).json({ msg: "Usuario no encontrado" });
+        const emailExists = await Usuario.findOne({ where: { email: usuario.email } });
+        if (emailExists) {
+            return res.status(404).json({
+                msg: 'El correo electrónico ya está en uso',
+            });
         }
 
-        await usuario.update(req.body);
-        res.status(200).json(usuario);
+        // Hash de la contraseña antes de almacenarla en la base de datos
+        const hashedPassword = await bcrypt.hash(usuario.password, 10);
+
+        const newUsuario = await Usuario.create({
+            ...usuario,
+            password: hashedPassword,
+        });
+
+        res.json({
+            msg: "Usuario agregado con exito",
+            usuario: newUsuario
+        })
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(500).json({
+            msg: "Error al procesar datos"
+        });
+        console.log(error);
     }
 }
 
-const deleteUsuario = async (req, res) => {
+const getUsuariosAdmin = async (req, res) => {
+
+    if (!req.usuario) {
+        res.status(500).json({
+            data: undefined,
+            msg: 'Error Token',
+            dd: req.usuario
+        });
+        return
+    }
+
+
+    let usuarios = await Usuario.findAll();
+
+    res.status(200).json(usuarios);
+
+}
+
+const getUsuarioAdmin = async (req, res) => {
+
+    if (!req.usuario) {
+        res.status(500).json({
+            data: undefined,
+            msg: 'Error Token',
+            dd: req.usuario
+        });
+        return
+    }
+
+    let id = req.params['id'];
+
     try {
-        const { id } = req.params;
-        const usuario = await Usuario.findByPk(id);
+        let usuario = await Usuario.findByPk(id);
 
         if (!usuario) {
-            return res.status(404).json({ msg: "Usuario no encontrado" });
+            return res.status(404).json({
+                ok: false,
+                msg: 'usuario no existe en la base de dato',
+            });
         }
 
-        await usuario.destroy();
-        res.status(200).json({ msg: "Usuario eliminado correctamente" });
+        res.json({
+            ok: true,
+            usuario,
+        });
+
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({
+            ok: false,
+            message: 'Error al procesar datos',
+        })
     }
 }
+
+const updateUsuarioAdmin = async (req, res) => {
+
+    if (!req.usuario) {
+        res.status(500).json({
+            data: undefined,
+            msg: 'Error Token',
+            dd: req.usuario
+        });
+        return
+    }
+
+    let id = req.params['id'];
+    let data = req.body;
+    try {
+        let usuario = await Usuario.update({
+            nombres: data.nombres,
+            apellidos: data.apellidos,
+            rol: data.rol,
+            email: data.email
+        }, {
+            where: { id: id }
+        });
+
+        const usuarioAct = await Usuario.findOne({ where: { id: id } })
+
+        res.json({
+            ok: true,
+            usuarioAct
+        });
+    } catch (error) {
+        res.status(500).send({
+            ok: false,
+            msg: 'Error al procesar datos'
+        })
+        console.log(error);
+    }
+}
+
+const cambiarEstadoAdmin = async (req, res) => {
+    if (!req.usuario) {
+        res.status(500).json({
+            data: undefined,
+            msg: 'Error Token',
+            dd: req.usuario
+        });
+        return
+    }
+
+    let id = req.params['id'];
+    let data = req.body;
+
+    let nuevo_estado = false;
+
+    if (data.estado) {
+        nuevo_estado = false;
+    } else {
+        nuevo_estado = true;
+    }
+
+
+    try {
+
+        let usuario = await Usuario.update({
+            estado: nuevo_estado
+        }, {
+            where: { id: id }
+        });
+
+        const usuarioAct = await Usuario.findOne({ where: { id: id } })
+
+        res.status(200).json({
+            ok: true,
+            usuarioAct,
+            nuevo_estado
+        });
+    } catch (error) {
+        res.status(500).send({
+            ok: false,
+            msg: 'Error al procesar datos'
+        })
+        console.log(error);
+    }
+}
+
 
 module.exports = {
-    getUsuarios,
-    getUsuario,
     postUsuarioAdmin,
-    putUsuario,
-    deleteUsuario
+    getUsuariosAdmin,
+    getUsuarioAdmin,
+    updateUsuarioAdmin,
+    cambiarEstadoAdmin,
 }
