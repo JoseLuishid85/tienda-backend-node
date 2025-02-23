@@ -25,7 +25,6 @@ const crearCategoria = async (req, res) => {
         return res.status(500).send({ data: undefined, msg: 'El nombre de la categoria ya existe en la base de datos' });
     }
     
-    // Crear el producto en la base de datos
     try {
         data.slug = slugify(data.nombre).toLowerCase();
         const newCategoria = await Categoria.create(data);
@@ -35,7 +34,7 @@ const crearCategoria = async (req, res) => {
     }
 
 }
-/*
+
 const getCategorias = async (req, res) => {
 
     if (!req.usuario) {
@@ -47,22 +46,9 @@ const getCategorias = async (req, res) => {
         return
     }
 
-    let filtro = req.params['filtro'];
-
-    let whereCondition = {};
-
-    if (filtro) {
-        whereCondition = {
-            [Op.or]: [
-                { nombre: { [Op.like]: `%${filtro}%` } },
-            ]
-        };
-    }
-
     let categoria = await Categoria.findAll({
-        where: whereCondition,
         order: [['nombre', 'ASC']],
-        include: Sub_Categoria
+        //include: Sub_Categoria
     });
 
     res.status(200).json(
@@ -88,7 +74,7 @@ const obtenerCategoria = async (req, res) => {
             where: {
                 id: id
             },
-            include: Sub_Categoria
+            //include: Sub_Categoria
         });
 
         if (!categoria) {
@@ -226,13 +212,12 @@ const actualizarEstadoCategoria = async (req, res) => {
     }
 
 }
-/*/
+
 module.exports = {
-    crearCategoria
-    /*
+    crearCategoria,
     getCategorias,
     obtenerCategoria,
     actualizarCategoria,
     eliminarCategoria,
-    actualizarEstadoCategoria*/
+    actualizarEstadoCategoria
 }
