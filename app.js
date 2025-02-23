@@ -14,6 +14,7 @@ sequelize.sync({ force: false })
 app.use('/store/api/login', require('./routes/authRouter.js'));
 app.use('/store/api/usuario', require('./routes/usuario'));
 app.use('/store/api/categoria', require('./routes/categoriaRouter.js'));
+app.use('/store/api/sub_categoria', require('./routes/subCategoriaRouter.js'));
 
 const PORT = 4000;
  
