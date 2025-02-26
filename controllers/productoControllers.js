@@ -35,7 +35,7 @@ const registro_producto = async (req, res) => {
 
     // Crear el producto en la base de datos
     try {
-        const producto = await Producto.create(data);
+        //const producto = await Producto.create(data);
         return res.status(200).send({ data: data });
     } catch (error) {
         return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
