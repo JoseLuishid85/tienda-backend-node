@@ -16,6 +16,8 @@ app.use('/store/api/usuario', require('./routes/usuario'));
 app.use('/store/api/categoria', require('./routes/categoriaRouter.js'));
 app.use('/store/api/sub_categoria', require('./routes/subCategoriaRouter.js'));
 
+app.use('/store/api/producto', require('./routes/productoRouter.js'));
+
 const PORT = 4000;
  
 app.listen(PORT, () => {
