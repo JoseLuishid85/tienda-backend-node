@@ -30,12 +30,13 @@ const registro_producto = async (req, res) => {
     const str_img = img_path.split('\\');
     const str_portada = str_img[str_img.length - 1];
     
-    data.portada = `uploads/productos/${str_portada}`;
+    //data.portada = `uploads/productos/${str_portada}`;
+    data.portada = str_portada;
     data.slug = slugify(data.titulo).toLowerCase(); 
 
     // Crear el producto en la base de datos
     try {
-        //const producto = await Producto.create(data);
+        const producto = await Producto.create(data);
         return res.status(200).send({ data: data });
     } catch (error) {
         return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
