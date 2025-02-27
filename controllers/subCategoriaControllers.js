@@ -134,7 +134,6 @@ const actualizarSubCategoria = async (req, res) => {
 
 }
 
-
 const eliminarSubCategoria = async (req, res) => {
 
     if (!req.usuario) {

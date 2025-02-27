@@ -20,14 +20,7 @@ const registro_producto = async (req, res) => {
 
     let data = req.body;
     await Producto.sync();
-    /*
-    const existingProduct = await Producto.findOne({ where: { titulo: data.titulo } });
 
-    if (existingProduct) {
-        return res.status(500).send({ data: undefined, msg: 'El título ya existe en la base de datos' });
-    }*/
-
-    // Procesar la imagen de portada
     if (!req.file) {
         return res.status(400).json({ msg: 'No se subió ningún archivo' });
     }
@@ -138,8 +131,8 @@ const obtenerProductoAdmin = async (req, res) => {
         })
     }
 }
-/*
-const actualizarProductoAdmin = async (req, res) => {
+
+const actualizar_producto = async (req, res) => {
     if (!req.usuario) {
         return res.status(500).json({
             data: undefined,
@@ -148,36 +141,56 @@ const actualizarProductoAdmin = async (req, res) => {
         });
     }
 
+    const { id } = req.params; // Obtener el ID del producto a actualizar
     let data = req.body;
-    let id = parseInt(req.params['id']);
 
-    const existingProduct = await Producto.findOne({ where: { titulo: data.titulo } });
-    if (existingProduct && existingProduct.id !== id) {
-        return res.status(500).send({ data: undefined, msg: 'El título ya existe en la base de datos' });
+    if (!req.file) {
+        return res.status(400).json({ msg: 'No se subió ningún archivo' });
     }
+
+    const img_path = req.file.path;
+    const str_img = img_path.split('\\');
+    const str_portada = str_img[str_img.length - 1];
+    data.portada = str_portada;
 
     try {
-        if (req.file) {
-            const img_path = req.file.path;
-            const str_img = img_path.split('\\');
-            const str_portada = str_img[str_img.length - 1];
-            data.portada = str_portada;
+
+        if (data.titulo) {
+            data.slug = slugify(data.titulo).toLowerCase();
         }
-
-        data.slug = slugify(data.titulo).toLowerCase();
-
-        const producto = await Producto.update(data, {
-            where: { id: id }
+    
+        const product = await Producto.update({
+            titulo: data.titulo,
+            slug: data.slug,
+            costo: data.costo,
+            porcentaje_ganancia: data.porcentaje_ganancia,
+            precio: data.precio,   
+            extracto: data.extracto,
+            talla: data.talla,
+            color: data.color,
+            medida: data.medida ,
+            portada: data.portada,
+            estado: data.estado,
+            descuento: data.descuento,
+            stock: data.stock,
+            categoriaId:  data.categoriaId,
+            subCategoriaId: data.subCategoriaId
+        }, {
+            where: {
+                id: id
+            }
         });
 
-        res.status(200).send({
-            data: producto
-        });
+        if (product) {
+            const productoActualizado = await Producto.findByPk(id);
+            return res.status(200).send({ data: productoActualizado, msg: 'Producto actualizado correctamente' });
+        } else {
+            return res.status(404).send({ ok: false, data: undefined, msg: 'Producto no encontrado' });
+        }
     } catch (error) {
-        console.error(error);
         return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
     }
-};*/
+};
 
 const listaProductoActivoAdmin = async (req, res) => {
 
@@ -230,6 +243,7 @@ module.exports = {
     registro_producto,
     getProductoAdmin,
     obtenerProductoAdmin,
+    actualizar_producto,
     obtenerImageProducto,
     listaProductoActivoAdmin
 }

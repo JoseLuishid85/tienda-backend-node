@@ -7,6 +7,7 @@ const {
     getProductoAdmin, 
     obtenerImageProducto, 
     listaProductoActivoAdmin,
+    actualizar_producto,
     obtenerProductoAdmin, 
 } = require('../controllers/productoControllers.js');
 
@@ -26,8 +27,8 @@ const routes = express.Router();
 
 routes.post('/', [validarJWT, upload.single('portada')], registro_producto);
 routes.get('/buscar/:filtro?', validarJWT, getProductoAdmin);
-routes.get('/:id', validarJWT, obtenerProductoAdmin);
-//routes.put('/:id', [validarJWT, upload.single('portada')], actualizarProductoAdmin);
+routes.get('/obtener/:id', validarJWT, obtenerProductoAdmin);
+routes.put('/uptade/:id', [validarJWT, upload.single('portada')], actualizar_producto);
 
 routes.get('/lista_producto_activo/', validarJWT, listaProductoActivoAdmin);
 routes.get('/obtener_image_producto/:img', obtenerImageProducto); 
