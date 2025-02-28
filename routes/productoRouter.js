@@ -46,8 +46,8 @@ routes.get('/lista_producto_activo/', validarJWT, listaProductoActivoAdmin);
 routes.get('/obtener_image_producto/:img', obtenerImageProducto); 
 
 //GALERIA
-routes.post('/subir_imagen_producto_admin', [validarJWT, uploadGaleria.single('image')], subirImageProductoAdmin);
-//routes.post('/subir_imagen_producto_admin', [validarJWT, uploadGaleria.any()], subirImageProductoAdmin);
+//routes.post('/subir_imagen_producto_admin', [validarJWT, uploadGaleria.single('image')], subirImageProductoAdmin);
+routes.post('/subir_imagen_producto_admin', [validarJWT, uploadGaleria.any()], subirImageProductoAdmin);
 
 
 module.exports = routes;

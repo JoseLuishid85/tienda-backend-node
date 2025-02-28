@@ -238,7 +238,7 @@ const obtenerImageProducto = async (req, res) => {
         res.status(404).sendFile(defaultImagePath);
     }
 };
-/*
+
 const subirImageProductoAdmin = async (req, res) => {
     if (!req.usuario) {
         return res.status(500).json({
@@ -271,8 +271,8 @@ const subirImageProductoAdmin = async (req, res) => {
             .catch(error => res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos', error }));
     });
 };
-*/
 
+/*
 const subirImageProductoAdmin = async (req, res) =>{
     if (!req.usuario) {
         res.status(500).json({
@@ -301,7 +301,7 @@ const subirImageProductoAdmin = async (req, res) =>{
     } catch (error) {
         return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
     }
-}
+}*/
 
 module.exports = {
     registro_producto,
