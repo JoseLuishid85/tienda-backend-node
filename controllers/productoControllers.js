@@ -6,6 +6,7 @@ const fs = require('fs');
 const Categoria = require('../models/Categoria.js');
 const Producto = require('../models/Producto.js')
 const SubCategoria = require('../models/SubCategoria.js');
+const Galeria = require('../models/Galeria.js');
 
 const registro_producto = async (req, res) => {
 
@@ -25,11 +26,10 @@ const registro_producto = async (req, res) => {
         return res.status(400).json({ msg: 'No se subió ningún archivo' });
     }
 
-    const img_path = req.file.path;
-    const str_img = img_path.split('\\');
-    const str_portada = str_img[str_img.length - 1];
+    let img_path = req.file.path;
+    let str_img = img_path.split('\\');
+    let str_portada = str_img[str_img.length - 1];
     
-    //data.portada = `uploads/productos/${str_portada}`;
     data.portada = str_portada;
     data.slug = slugify(data.titulo).toLowerCase(); 
 
@@ -238,6 +238,70 @@ const obtenerImageProducto = async (req, res) => {
         res.status(404).sendFile(defaultImagePath);
     }
 };
+/*
+const subirImageProductoAdmin = async (req, res) => {
+    if (!req.usuario) {
+        return res.status(500).json({
+            data: undefined,
+            msg: 'Error Token',
+            dd: req.usuario
+        });
+    }
+
+    if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ msg: 'No se subió ningún archivo' });
+    }
+
+    let file = req.files[0]; // Usar el primer archivo recibido
+    let fileName = `${Date.now()}_${file.originalname}`; // Nombre único
+    let filePath = `./uploads/galeria/${fileName}`;
+
+    // Escribir el archivo en disco
+    fs.writeFile(filePath, file.buffer, (err) => {
+        if (err) {
+            return res.status(500).json({ msg: 'Error al guardar la imagen', error: err });
+        }
+
+        let data = req.body;
+        data.image = fileName;
+
+        Galeria.sync()
+            .then(() => Galeria.create(data))
+            .then(galeria => res.status(200).send({ data: galeria }))
+            .catch(error => res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos', error }));
+    });
+};
+*/
+
+const subirImageProductoAdmin = async (req, res) =>{
+    if (!req.usuario) {
+        res.status(500).json({
+            data: undefined,
+            msg: 'Error Token',
+            dd: req.usuario
+        });
+        return
+    }
+
+    let data = req.body;
+
+    if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ msg: 'No se subió ningún archivo' });
+    }
+    
+    let img_path = req.files[0].path;
+    let str_img = img_path.split('\\');
+    let str_imagen = str_img[str_img.length - 1];
+    
+    data.image = str_imagen; 
+    await Galeria.sync();
+    try {
+        const galeria = await Galeria.create(data);
+        return res.status(200).send({ data: data });
+    } catch (error) {
+        return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
+    }
+}
 
 module.exports = {
     registro_producto,
@@ -245,5 +309,6 @@ module.exports = {
     obtenerProductoAdmin,
     actualizar_producto,
     obtenerImageProducto,
-    listaProductoActivoAdmin
+    listaProductoActivoAdmin,
+    subirImageProductoAdmin
 }
