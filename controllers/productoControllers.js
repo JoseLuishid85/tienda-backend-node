@@ -253,7 +253,8 @@ const subirImageProductoAdmin = async (req, res) => {
     }
 
     let file = req.files[0]; // Usar el primer archivo recibido
-    let fileName = `${Date.now()}_${file.originalname}`; // Nombre único
+    let extension = file.originalname.split('.').pop(); // Obtiene la extensión (ej: "jpg")
+    let fileName = `${Date.now()}.${extension}`; // Agrega la extensión al nombre del archivo
     let filePath = `./uploads/galeria/${fileName}`;
 
     // Escribir el archivo en disco
@@ -271,6 +272,92 @@ const subirImageProductoAdmin = async (req, res) => {
             .catch(error => res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos', error }));
     });
 };
+
+const obtenerGaleriaProducto = async (req, res) => {
+
+    const img = req.params['img'];
+
+    // Validar que el nombre de la imagen no contenga caracteres peligrosos
+    if (/\.\./g.test(img)) {
+        return res.status(400).send({ message: 'Nombre de archivo no válido' });
+    }
+
+    // Construir la ruta de la imagen
+    const imagePath = path.join(__dirname, '../uploads/galeria', img);
+
+    try {
+        // Verificar si la imagen existe
+        await fs.promises.access(imagePath, fs.constants.F_OK);
+
+        // Si existe, enviar la imagen
+        res.status(200).sendFile(imagePath);
+    } catch (error) {
+        // Si no existe, enviar la imagen por defecto
+        const defaultImagePath = path.join(__dirname, '../uploads/default.jpg');
+        res.status(404).sendFile(defaultImagePath);
+    }
+}
+
+const obtenerGaleriaProductoAdmin = async (req, res) => {
+
+    if (!req.usuario) {
+        res.status(500).json({
+            data: undefined,
+            msg: 'Error Token',
+            dd: req.usuario
+        });
+        return
+    }
+
+    let id = req.params['id'];
+
+    try {
+        let galeria = await Galeria.findAll({
+            where: {
+                productoId: id
+            },
+        });
+        return res.status(200).send({ data: galeria });
+    } catch (error) {
+        return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
+    }
+
+}
+
+const eliminarGaleriaProductoAdmin = async (req, res) => {
+
+    if (!req.usuario) {
+        res.status(500).json({
+            data: undefined,
+            msg: 'Error Token',
+            dd: req.usuario
+        });
+        return
+    }
+
+    let id = req.params['id'];
+
+    try {
+        let galeria = await Galeria.findOne({
+            where: {
+                id: id
+            },
+        });
+
+        let path_img = './uploads/galeria/' + galeria.image;
+
+        fs.unlinkSync(path_img);
+        await galeria.destroy();
+
+        res.status(200).json({ 
+            msg:'Imagen eliminada',
+            galeria
+        });
+    } catch (error) {
+        return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
+    }
+
+}
 
 /*
 const subirImageProductoAdmin = async (req, res) =>{
@@ -310,5 +397,8 @@ module.exports = {
     actualizar_producto,
     obtenerImageProducto,
     listaProductoActivoAdmin,
-    subirImageProductoAdmin
+    subirImageProductoAdmin,
+    obtenerGaleriaProducto,
+    obtenerGaleriaProductoAdmin,
+    eliminarGaleriaProductoAdmin
 }

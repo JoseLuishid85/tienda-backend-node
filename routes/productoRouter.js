@@ -9,7 +9,10 @@ const {
     listaProductoActivoAdmin,
     actualizar_producto,
     obtenerProductoAdmin, 
-    subirImageProductoAdmin
+    subirImageProductoAdmin,
+    obtenerGaleriaProducto,
+    obtenerGaleriaProductoAdmin,
+    eliminarGaleriaProductoAdmin
 } = require('../controllers/productoControllers.js');
 
 const storage = multer.diskStorage({
@@ -48,6 +51,9 @@ routes.get('/obtener_image_producto/:img', obtenerImageProducto);
 //GALERIA
 //routes.post('/subir_imagen_producto_admin', [validarJWT, uploadGaleria.single('image')], subirImageProductoAdmin);
 routes.post('/subir_imagen_producto_admin', [validarJWT, uploadGaleria.any()], subirImageProductoAdmin);
+routes.get('/obtener_galeria_producto/:img', obtenerGaleriaProducto);
+routes.get('/obtener_galeria_producto_admin/:id', validarJWT, obtenerGaleriaProductoAdmin);
+routes.delete('/eliminar_galeria_producto_admin/:id', validarJWT, eliminarGaleriaProductoAdmin);
 
 
 module.exports = routes;
