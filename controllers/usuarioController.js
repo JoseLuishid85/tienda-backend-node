@@ -57,7 +57,7 @@ const getUsuariosAdmin = async (req, res) => {
     }
 
 
-    let usuarios = await Usuario.findAll();
+    let usuarios = await Usuario.findAll({ attributes: { exclude: ['password'] }  });
 
     res.status(200).json(usuarios);
 
@@ -77,7 +77,12 @@ const getUsuarioAdmin = async (req, res) => {
     let id = req.params['id'];
 
     try {
-        let usuario = await Usuario.findByPk(id);
+        let usuario = await Usuario.findOne({
+            where: {
+                id: id
+            },
+            attributes: { exclude: ['password'] }
+        });
 
         if (!usuario) {
             return res.status(404).json({
@@ -122,7 +127,7 @@ const updateUsuarioAdmin = async (req, res) => {
             where: { id: id }
         });
 
-        const usuarioAct = await Usuario.findOne({ where: { id: id } })
+        const usuarioAct = await Usuario.findOne({ where: { id: id }, attributes: { exclude: ['password'] } } )
 
         res.json({
             ok: true,
@@ -167,7 +172,7 @@ const cambiarEstadoAdmin = async (req, res) => {
             where: { id: id }
         });
 
-        const usuarioAct = await Usuario.findOne({ where: { id: id } })
+        const usuarioAct = await Usuario.findOne({ where: { id: id } , attributes: { exclude: ['password'] }})
 
         res.status(200).json({
             ok: true,

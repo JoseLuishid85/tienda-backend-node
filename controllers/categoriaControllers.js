@@ -67,7 +67,7 @@ const obtenerCategoria = async (req, res) => {
         return
     }
 
-    let id = req.params['id'];
+    let id = req.params.id;
 
     try {
         let categoria = await Categoria.findOne({

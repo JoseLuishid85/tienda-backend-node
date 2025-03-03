@@ -7,6 +7,7 @@ const Categoria = require('../models/Categoria.js');
 const Producto = require('../models/Producto.js')
 const SubCategoria = require('../models/SubCategoria.js');
 const Galeria = require('../models/Galeria.js');
+const Variedad = require('../models/Variedad.js');
 
 const registro_producto = async (req, res) => {
 
@@ -110,6 +111,10 @@ const obtenerProductoAdmin = async (req, res) => {
                 {
                     model: SubCategoria,
                     as: 'subCategoria', 
+                },
+                {
+                    model: Variedad,
+                    as: "Variedad"
                 }
             ],
         });
