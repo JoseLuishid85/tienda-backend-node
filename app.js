@@ -20,6 +20,7 @@ app.use('/store/api/sub_categoria', require('./routes/subCategoriaRouter.js'));
 app.use('/store/api/producto', require('./routes/productoRouter.js'));
 app.use('/store/api/variedad', require('./routes/variedadRouter.js'));
 app.use('/store/api/cliente', require('./routes/clienteRouter.js'));
+app.use('/store/api/direccion/',  require('./routes/direccionRouter.js'));
 
 app.use(express.urlencoded({ extended: true }));
 
