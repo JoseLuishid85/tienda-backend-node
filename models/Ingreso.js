@@ -53,4 +53,5 @@ Ingreso.init({
 
 Usuario.hasMany(Ingreso, { foreignKey: 'usuarioId', as: 'ingreso' });
 
+
 module.exports = Ingreso;

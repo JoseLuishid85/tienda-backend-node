@@ -1,9 +1,9 @@
 const Producto = require('../models/Producto.js')
 const Variedad = require('../models/Variedad.js');
 const Ingreso = require('../models/Ingreso.js');
-//const DetalleIngreso = require('../models/Ingreso_detalle.js');
-const { Op } = require('sequelize');
-
+const DetalleIngreso = require('../models/DetalleIngreso.js');
+const fs = require('fs');
+const path = require('path');
 
 const registroIngresoAdmin = async (req, res) => {
 
@@ -16,15 +16,8 @@ const registroIngresoAdmin = async (req, res) => {
         return
     }
 
-    
-
     let data = req.body;
-    //let detalles = JSON.parse(data.detalles);
-
-    // Procesar la imagen de portada
-    //const img_path = req.files.documento.path;
-   // const str_img = img_path.split('\\');
-    //const str_documento = str_img[2];
+    let detalles = JSON.parse(data.detalles);
 
     let img_path = req.file.path;
     let str_img = img_path.split('\\');
@@ -45,46 +38,51 @@ const registroIngresoAdmin = async (req, res) => {
     }
 
     await Ingreso.sync();
-    //await DetalleIngreso.sync();
+    await DetalleIngreso.sync();
 
     try {
 
         const ingreso = await Ingreso.create(data);
-        /*
-        for (var item of detalles) {
-            item.id_ingreso = ingreso.id;
 
-            let variedad = await Variedad.findOne({ where: { id: item.id_variedad } });
+        for (var item of detalles) {
+            item.ingresoId = ingreso.id;
+
+            let variedad = await Variedad.findOne({ where: { id: item.variedadId } });
             await Variedad.update({ stock: variedad.stock + item.cantidad }, {
                 where: {
-                    id: item.id_variedad
+                    id: item.variedadId
                 }
             });
 
-            const sumaStock = await Variedad.sum('stock', {  where: {  id_producto: item.id_producto  }  });
+            const sumaStock = await Variedad.sum('stock', { where: { productoId: item.productoId } });
             await Producto.update({ stock: sumaStock }, {
                 where: {
-                    id: item.id_producto
+                    id: item.productoId
                 }
             });
 
             await DetalleIngreso.create(item);
+
         }
 
-        const detallesIngreso = await DetalleIngreso.findAll({
-            where: { id_ingreso: ingreso.id }
+        const newIngreso = await Ingreso.findOne({
+            where: { id: ingreso.id },
+            include: [
+                {
+                    model: DetalleIngreso,
+                    as: 'detalles'
+                }
+            ]
         });
 
-        /*/
         return res.status(200).json({
-            ingreso: ingreso,
-            //detalles: detallesIngreso
+            ingreso: newIngreso,
         });
     } catch (error) {
         return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
     }
 }
-/*
+
 const obtenerIngresosAdmin = async (req, res) => {
 
     if (!req.usuario) {
@@ -100,14 +98,19 @@ const obtenerIngresosAdmin = async (req, res) => {
     let ingreso;
     ingreso = await Ingreso.findAll({
         order: [['updatedAt', 'DESC']],
-        include: DetalleIngreso
+        include: [
+            {
+                model: DetalleIngreso,
+                as: 'detalles'
+            }
+        ]
     });
 
     res.send(ingreso);
 
 }
 
-const obtenerIngresoAdmin = async (req,res) =>{
+const obtenerIngresoAdmin = async (req, res) => {
     if (!req.usuario) {
         res.status(500).json({
             data: undefined,
@@ -124,10 +127,23 @@ const obtenerIngresoAdmin = async (req,res) =>{
             where: {
                 id: id
             },
-            include: [{
-                model: DetalleIngreso,
-                include: [Producto]
-            }]
+            include: [
+                {
+                    model: DetalleIngreso,
+                    as: 'detalles',
+                    /*
+                    include: [
+                        {
+                            model: Producto,
+                            as: 'producto' // Usa el alias correcto
+                        },
+                        {
+                            model: Variedad,
+                            as: 'variedad' // Usa el alias correcto
+                        }
+                    ]*/
+                }
+            ]
         });
 
         if (!ingreso) {
@@ -146,30 +162,36 @@ const obtenerIngresoAdmin = async (req,res) =>{
             message: 'Error al procesar datos',
         })
     }
-      
+
 }
 
 const obtenerDocumentoIngreso = async (req, res) => {
 
-    let name = req.params['name'];
+    const name = req.params['name'];
 
-    fs.stat('./uploads/documento/' + name, function (error) {
-        if (error) {
-            let path_img = './uploads/default.jpg';
-            res.status(200).sendFile(path.resolve(path_img));
-        } else {
-            let path_img = './uploads/documento/' + name;
-            res.status(200).sendFile(path.resolve(path_img));
-        }
-    });
+    if (/\.\./g.test(name)) {
+        return res.status(400).send({ message: 'Nombre de archivo no válido' });
+    }
+
+    const documento = path.join(__dirname, '../uploads/documentos', name);
+
+    try {
+        await fs.promises.access(documento, fs.constants.F_OK);
+
+        res.status(200).sendFile(documento);
+    } catch (error) {
+        // Si no existe, enviar la imagen por defecto
+        const defaultPath = path.join(__dirname, '../uploads/default.jpg');
+        res.status(404).sendFile(defaultPath);
+    }
+
+
 }
-
-*/
 
 
 module.exports = {
     registroIngresoAdmin,
-    //obtenerIngresosAdmin,
-    //obtenerIngresoAdmin,
-    //obtenerDocumentoIngreso
+    obtenerIngresosAdmin,
+    obtenerIngresoAdmin,
+    obtenerDocumentoIngreso
 }

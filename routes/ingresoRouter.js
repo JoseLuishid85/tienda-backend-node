@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const validarJWT = require('../middlewares/validar-token.js');
-const { registroIngresoAdmin } = require('../controllers/ingresoControllers.js');
+const { registroIngresoAdmin, obtenerIngresosAdmin, obtenerIngresoAdmin, obtenerDocumentoIngreso } = require('../controllers/ingresoControllers.js');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -19,9 +19,9 @@ const upload = multer({ storage });
 const routes = express.Router();
 
 routes.post('/', [validarJWT, upload.single('documento')], registroIngresoAdmin); ///
-//routes.get('/', validarJWT, obtenerIngresosAdmin); ///
-//routes.get('/:id', validarJWT, obtenerIngresoAdmin); ///
-///routes.get('/documento/:name', obtenerDocumentoIngreso); ///
+routes.get('/', validarJWT, obtenerIngresosAdmin); 
+routes.get('/:id', validarJWT, obtenerIngresoAdmin); 
+routes.get('/documento/:name', obtenerDocumentoIngreso); 
 
 
 module.exports = routes; 

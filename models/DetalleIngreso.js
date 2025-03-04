@@ -53,7 +53,7 @@ detalleIngreso.init({
     timestamps: true
 });
 
-Ingreso.hasMany(detalleIngreso, { foreignKey: 'ingresoId', as: 'ingreso' });
+Ingreso.hasMany(detalleIngreso, { foreignKey: 'ingresoId', as: 'detalles' });
 detalleIngreso.belongsTo(Ingreso, { foreignKey: 'ingresoId', as: 'detalle_ingreso' });
 
 module.exports = detalleIngreso;
