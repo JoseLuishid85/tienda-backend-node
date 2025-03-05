@@ -5,8 +5,8 @@ const sequelize = require('./config/database');
 require('dotenv').config();
 app.use(express.json());
 
-
-sequelize.sync({ force: false })
+//force: false alter: true
+sequelize.sync({ force: false }) 
     .then(() => {
         console.log('Base de datos sincronizada dd.');
     })
@@ -23,6 +23,8 @@ app.use('/store/api/cliente', require('./routes/clienteRouter.js'));
 app.use('/store/api/direccion/',  require('./routes/direccionRouter.js'));
 app.use('/store/api/ingreso/', require('./routes/ingresoRouter.js'));
 app.use('/store/api/detalle_ingreso/', require('./routes/detalleIngresoRouter.js'));
+app.use('/store/api/publico/',  require('./routes/publicoRouter.js'));
+app.use('/store/api/customer/',  require('./routes/customerRouter.js'));
 
 app.use(express.urlencoded({ extended: true }));
 
