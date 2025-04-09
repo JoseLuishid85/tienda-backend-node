@@ -1,9 +1,11 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const sequelize = require('./config/database');
 
 require('dotenv').config();
 app.use(express.json());
+app.use(cors());
 
 //force: false alter: true
 sequelize.sync({ force: false }) 
@@ -25,6 +27,8 @@ app.use('/store/api/ingreso/', require('./routes/ingresoRouter.js'));
 app.use('/store/api/detalle_ingreso/', require('./routes/detalleIngresoRouter.js'));
 app.use('/store/api/publico/',  require('./routes/publicoRouter.js'));
 app.use('/store/api/customer/',  require('./routes/customerRouter.js'));
+app.use('/store/api/venta/',  require('./routes/ventaRouter.js'));
+app.use('/store/api/detalleventa/',  require('./routes/detalleventaRouter.js'));
 
 app.use(express.urlencoded({ extended: true }));
 

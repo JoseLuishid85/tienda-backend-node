@@ -16,7 +16,7 @@ const crearProductoCarrito = async (req, res) => {
     }
     
     let data = req.body;
-    data.id_cliente = req.cliente.id
+    data.clienteId = req.cliente.id
     
     const variedad = await Variedad.findOne({
         where: {
@@ -90,7 +90,7 @@ const listaCarritoCliente = async(req, res) =>{
 
     let carrito = await Carrito.findAll({
         where: {
-            clienteId: 1
+            clienteId: req.cliente.id
         },
         
         include: [
@@ -110,7 +110,7 @@ const listaCarritoCliente = async(req, res) =>{
         limit: 5, 
         order: [['createdAt', 'DESC']] 
     });
-/*
+
     let carrito_general = await Carrito.findAll({
         where: {
             clienteId: req.cliente.id
@@ -130,11 +130,11 @@ const listaCarritoCliente = async(req, res) =>{
             }
         ],
         order: [['createdAt', 'DESC']] 
-    });*/
+    });
 
     res.status(200).send({
         carrito: carrito,
-        //carrito_general: carrito_general
+        carrito_general: carrito_general
     });
 }
 
