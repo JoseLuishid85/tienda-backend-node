@@ -33,10 +33,12 @@ const loginUsuario = async (req, res) => {
 
     // Generar un token JWT
     const token = await generarJWT(usuario.id);
+    const expiresIn = 5 * 24 * 60 * 60;
 
     res.json({
       msg: 'Inicio de sesión exitoso',
       usuario,
+      expiresIn,
       token: token,
     });
   } catch (error) {
