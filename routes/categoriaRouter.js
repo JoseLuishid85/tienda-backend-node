@@ -30,7 +30,7 @@ const upload = multer({ storage });
 routes.get('/', validarJWT, getCategorias);     
 routes.post('/', [validarJWT, upload.single('imagen')],  crearCategoria);
 routes.get('/:id', validarJWT, obtenerCategoria);
-routes.put('/:id', validarJWT, actualizarCategoria);
+routes.put('/:id', [validarJWT, upload.single('imagen')], actualizarCategoria);
 routes.delete('/:id', validarJWT, eliminarCategoria);
 
 routes.put('/estado/:id', validarJWT, actualizarEstadoCategoria);

@@ -106,6 +106,59 @@ const obtenerCategoria = async (req, res) => {
 }
 
 const actualizarCategoria = async (req, res) => {
+    if (!req.usuario) {
+        return res.status(500).json({
+            data: undefined,
+            msg: 'Error Token',
+            dd: req.usuario
+        });
+    }
+
+    let data = req.body;
+    let id = parseInt(req.params['id']);
+
+    try {
+        // Buscar la categoría existente
+        const categoria = await Categoria.findOne({ where: { id: id } });
+        
+        if (!categoria) {
+            return res.status(404).send({ data: undefined, msg: 'La categoría no existe en la base de datos' });
+        }
+
+        // Procesar la imagen si se subió una nueva
+        if (req.file) {
+            let img_path = req.file.path;
+            let str_img = img_path.split('\\');
+            let str_imagen = str_img[str_img.length - 1];
+            data.imagen = str_imagen;
+        }
+
+        // Generar el slug
+        data.slug = slugify(data.nombre).toLowerCase();
+
+        // Actualizar la categoría
+        await Categoria.update(data, {
+            where: { id: id }
+        });
+
+        // Obtener la categoría actualizada para devolverla en la respuesta
+        const categoriaActualizada = await Categoria.findOne({ where: { id: id } });
+
+        return res.status(200).json({
+            data: categoriaActualizada
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ 
+            ok: false, 
+            data: undefined, 
+            msg: 'Error al procesar datos',
+            error: error.message 
+        });
+    }
+}
+/*
+const actualizarCategoria = async (req, res) => {
 
     if (!req.usuario) {
         res.status(500).json({
@@ -148,7 +201,7 @@ const actualizarCategoria = async (req, res) => {
         return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
     }
 
-}
+}*/
 
 const eliminarCategoria = async (req, res) => {
 
