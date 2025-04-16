@@ -11,20 +11,30 @@ const crearCategoria = async (req, res) => {
             data: undefined,
             msg: 'Error Token',
             dd: req.usuario
-        });  
+        });
         return
     }
 
+    if (!req.file) {
+        return res.status(400).json({ msg: 'No se subió ningún archivo' });
+    }
+
     let data = req.body;
-    
+
+    let img_path = req.file.path;
+    let str_img = img_path.split('\\');
+    let str_imagen = str_img[str_img.length - 1];
+
+    data.imagen = str_imagen;
+
     await Categoria.sync();
-    
+
     const existingCategoria = await Categoria.findOne({ where: { nombre: data.nombre } });
 
     if (existingCategoria) {
         return res.status(500).send({ data: undefined, msg: 'El nombre de la categoria ya existe en la base de datos' });
     }
-    
+
     try {
         data.slug = slugify(data.nombre).toLowerCase();
         const newCategoria = await Categoria.create(data);
@@ -108,7 +118,7 @@ const actualizarCategoria = async (req, res) => {
 
     let data = req.body;
     let id = parseInt(req.params['id']);
-    
+
     const categoria = await Categoria.findOne({ where: { id: id } });
 
     // Verificar si se encontró un producto existente
@@ -130,7 +140,7 @@ const actualizarCategoria = async (req, res) => {
         });
 
         const categoriaActualizada = await Categoria.findOne({ where: { id: id } });
-        
+
         res.status(200).json({
             data: categoriaActualizada
         })
@@ -162,8 +172,8 @@ const eliminarCategoria = async (req, res) => {
 
         await categoria.destroy();
 
-        res.status(200).json({ 
-            msg:'La categoria fue eliminada con exito',
+        res.status(200).json({
+            msg: 'La categoria fue eliminada con exito',
         });
     } catch (error) {
         return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
@@ -184,7 +194,7 @@ const actualizarEstadoCategoria = async (req, res) => {
 
     let data = req.body;
     let id = parseInt(req.params['id']);
-    
+
     const categoria = await Categoria.findOne({ where: { id: id } });
 
     // Verificar si se encontró un producto existente
@@ -203,7 +213,7 @@ const actualizarEstadoCategoria = async (req, res) => {
         });
 
         const categoriaActualizada = await Categoria.findOne({ where: { id: id } });
-        
+
         res.status(200).json({
             data: categoriaActualizada
         })
