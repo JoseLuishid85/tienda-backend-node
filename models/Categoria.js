@@ -15,7 +15,7 @@ Categoria.init({
     },
     imagen: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     slug: {
         type: DataTypes.STRING,
