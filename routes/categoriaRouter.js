@@ -8,7 +8,8 @@ const {
     obtenerCategoria,
     actualizarCategoria,
     eliminarCategoria,
-    actualizarEstadoCategoria
+    actualizarEstadoCategoria,
+    obtenerImageCategoria
 } = require('../controllers/categoriaControllers.js');
 
 const storage = multer.diskStorage({
@@ -32,6 +33,8 @@ routes.post('/', [validarJWT, upload.single('imagen')],  crearCategoria);
 routes.get('/:id', validarJWT, obtenerCategoria);
 routes.put('/:id', [validarJWT, upload.single('imagen')], actualizarCategoria);
 routes.delete('/:id', validarJWT, eliminarCategoria);
+
+routes.get('/image/:img', obtenerImageCategoria); 
 
 routes.put('/estado/:id', validarJWT, actualizarEstadoCategoria);
 

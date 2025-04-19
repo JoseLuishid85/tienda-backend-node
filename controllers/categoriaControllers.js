@@ -1,7 +1,8 @@
 
 const { Op } = require('sequelize');
 const Categoria = require('../models/Categoria');
-///const Sub_Categoria = require('../models/Sub_Categoria');
+const path = require('path');
+const fs = require('fs');
 const slugify = require('slugify');
 
 const crearCategoria = async (req, res) => {
@@ -157,51 +158,6 @@ const actualizarCategoria = async (req, res) => {
         });
     }
 }
-/*
-const actualizarCategoria = async (req, res) => {
-
-    if (!req.usuario) {
-        res.status(500).json({
-            data: undefined,
-            msg: 'Error Token',
-            dd: req.usuario
-        });
-        return
-    }
-
-    let data = req.body;
-    let id = parseInt(req.params['id']);
-
-    const categoria = await Categoria.findOne({ where: { id: id } });
-
-    // Verificar si se encontró un producto existente
-    if (!categoria) {
-        res.status(500).send({ data: undefined, msg: 'La categoria no existe en la base de datos' });
-        return;
-    }
-
-    try {
-
-        let slug = slugify(data.nombre).toLowerCase();
-        const categoria = await Categoria.update({
-            nombre: data.nombre,
-            slug: slug
-        }, {
-            where: {
-                id: id
-            }
-        });
-
-        const categoriaActualizada = await Categoria.findOne({ where: { id: id } });
-
-        res.status(200).json({
-            data: categoriaActualizada
-        })
-    } catch (error) {
-        return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
-    }
-
-}*/
 
 const eliminarCategoria = async (req, res) => {
 
@@ -276,11 +232,36 @@ const actualizarEstadoCategoria = async (req, res) => {
 
 }
 
+const obtenerImageCategoria = async (req, res) => {
+    const img = req.params['img'];
+
+    // Validar que el nombre de la imagen no contenga caracteres peligrosos
+    if (/\.\./g.test(img)) {
+        return res.status(400).send({ message: 'Nombre de archivo no válido' });
+    }
+
+    // Construir la ruta de la imagen
+    const imagePath = path.join(__dirname, '../uploads/categorias', img);
+
+    try {
+        // Verificar si la imagen existe
+        await fs.promises.access(imagePath, fs.constants.F_OK);
+
+        // Si existe, enviar la imagen
+        res.status(200).sendFile(imagePath);
+    } catch (error) {
+        // Si no existe, enviar la imagen por defecto
+        const defaultImagePath = path.join(__dirname, '../uploads/default.jpg');
+        res.status(404).sendFile(defaultImagePath);
+    }
+};
+
 module.exports = {
     crearCategoria,
     getCategorias,
     obtenerCategoria,
     actualizarCategoria,
     eliminarCategoria,
-    actualizarEstadoCategoria
+    actualizarEstadoCategoria,
+    obtenerImageCategoria
 }
