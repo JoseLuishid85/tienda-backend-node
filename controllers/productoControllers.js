@@ -111,13 +111,17 @@ const obtenerProductoAdmin = async (req, res) => {
                 {
                     model: SubCategoria,
                     as: 'subCategoria', 
-                },
+                }
+            ],
+        });
+
+        /**
+         * ,
                 {
                     model: Variedad,
                     as: "Variedad"
                 }
-            ],
-        });
+         */
 
         if (!producto) {
             return res.status(404).json({
