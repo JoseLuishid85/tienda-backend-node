@@ -140,7 +140,7 @@ const obtenerProductoAdmin = async (req, res) => {
         })
     }
 }
-
+/*
 const actualizar_producto = async (req, res) => {
     if (!req.usuario) {
         return res.status(500).json({
@@ -197,6 +197,70 @@ const actualizar_producto = async (req, res) => {
             return res.status(404).send({ ok: false, data: undefined, msg: 'Producto no encontrado' });
         }
     } catch (error) {
+        return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
+    }
+};*/
+
+const actualizar_producto = async (req, res) => {
+    if (!req.usuario) {
+        return res.status(500).json({
+            data: undefined,
+            msg: 'Error Token',
+            dd: req.usuario
+        });
+    }
+
+    const { id } = req.params; // Obtener el ID del producto a actualizar
+    let data = req.body;
+
+    if (req.file) {
+        const img_path = req.file.path;
+        const str_img = img_path.split('\\');
+        const str_portada = str_img[str_img.length - 1];
+        data.portada = str_portada;
+    }
+
+    try {
+        if (data.titulo) {
+            data.slug = slugify(data.titulo).toLowerCase();
+        }
+
+        const updateData = {
+            titulo: data.titulo,
+            slug: data.slug,
+            costo: data.costo,
+            porcentaje_ganancia: data.porcentaje_ganancia,
+            precio: data.precio,   
+            extracto: data.extracto,
+            talla: data.talla,
+            color: data.color,
+            medida: data.medida,
+            estado: data.estado,
+            descuento: data.descuento,
+            stock: data.stock,
+            categoriaId: data.categoriaId,
+            subCategoriaId: data.subCategoriaId
+        };
+
+        // Solo actualiza la portada si se subió una imagen
+        if (req.file) {
+            updateData.portada = data.portada;
+        }
+
+        const product = await Producto.update(updateData, {
+            where: {
+                id: id
+            }
+        });
+
+        if (product) {
+            const productoActualizado = await Producto.findByPk(id);
+            return res.status(200).send({ data: productoActualizado, msg: 'Producto actualizado correctamente' });
+        } else {
+            return res.status(404).send({ ok: false, data: undefined, msg: 'Producto no encontrado' });
+        }
+    } catch (error) {
+        console.error(error); // Para depuración
         return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
     }
 };
