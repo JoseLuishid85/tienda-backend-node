@@ -8,7 +8,7 @@ app.use(express.json());
 app.use(cors());
 
 //force: false alter: true
-sequelize.sync({ alter: true }) 
+sequelize.sync({ force: true }) 
     .then(() => {
         console.log('Base de datos sincronizada dd.');
     })
