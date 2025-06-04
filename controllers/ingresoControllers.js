@@ -78,8 +78,9 @@ const registroIngresoAdmin = async (req, res) => {
         return res.status(200).json({
             ingreso: newIngreso,
         });
+        
     } catch (error) {
-        return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
+        return res.status(500).send({ ok: false, msg: 'Error al procesar datos' });
     }
 }
 

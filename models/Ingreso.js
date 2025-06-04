@@ -1,8 +1,9 @@
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../config/database');
 const Usuario = require('./Usuario');
+const Proveedor = require('./Proveedor');
 
-class Ingreso extends Model {}
+class Ingreso extends Model { }
 
 Ingreso.init({
     id: {
@@ -10,28 +11,33 @@ Ingreso.init({
         primaryKey: true,
         autoIncrement: true
     },
-    proveedor: {
+    proveedorId: { 
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: Proveedor,
+            key: 'id'
+        },
+        onDelete: 'CASCADE'
+    },
+    ncomprobante: {
         type: DataTypes.STRING,
         allowNull: false
     },
-    ncomprobante:{
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    documento:{
+    documento: {
         type: DataTypes.STRING,
         allowNull: false,
         defaultValue: 'Nada'
     },
-    monto_total:{
+    monto_total: {
         type: DataTypes.FLOAT,
         allowNull: false
     },
-    serie:{
+    serie: {
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    monto_resultante:{
+    monto_resultante: {
         type: DataTypes.FLOAT,
         allowNull: false
     },
@@ -47,11 +53,13 @@ Ingreso.init({
 }, {
     sequelize,
     modelName: 'Ingreso',
-    tableName: 'ingreso', 
+    tableName: 'ingreso',
     timestamps: true
 });
 
 Usuario.hasMany(Ingreso, { foreignKey: 'usuarioId', as: 'ingreso' });
+Proveedor.hasMany(Ingreso, { foreignKey: 'proveedorId', as: 'ingresos' });
+Ingreso.belongsTo(Proveedor, { foreignKey: 'proveedorId', as: 'proveedorInfo' });
 
 
 module.exports = Ingreso;

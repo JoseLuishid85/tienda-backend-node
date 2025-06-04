@@ -34,12 +34,11 @@ const registro_producto = async (req, res) => {
     data.portada = str_portada;
     data.slug = slugify(data.titulo).toLowerCase(); 
 
-    // Crear el producto en la base de datos
     try {
         const producto = await Producto.create(data);
-        return res.status(200).send({ data: data });
+        return res.status(200).send({ data: producto });
     } catch (error) {
-        return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
+        return res.status(500).send({ ok: false, msg: 'Error al procesar datos' });
     }
 
 }
@@ -392,8 +391,6 @@ const actualizar_variedadProducto = async (req, res) => {
             color: data.color,
             medida: data.medida,
         };
-
-        
 
         const product = await Producto.update(updateData, {
             where: {

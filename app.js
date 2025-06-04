@@ -21,6 +21,7 @@ app.use('/store/api/categoria', require('./routes/categoriaRouter.js'));
 app.use('/store/api/sub_categoria', require('./routes/subCategoriaRouter.js'));
 app.use('/store/api/producto', require('./routes/productoRouter.js'));
 app.use('/store/api/variedad', require('./routes/variedadRouter.js'));
+app.use('/store/api/proveedor', require('./routes/proveedorRouter.js'));
 app.use('/store/api/cliente', require('./routes/clienteRouter.js'));
 app.use('/store/api/direccion/',  require('./routes/direccionRouter.js'));
 app.use('/store/api/ingreso/', require('./routes/ingresoRouter.js'));
