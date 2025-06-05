@@ -8,15 +8,15 @@ app.use(express.json());
 app.use(cors());
 
 //force: false alter: true
-sequelize.sync({ force: true }) 
+sequelize.sync({ alter: true }) 
     .then(() => {
         console.log('Base de datos sincronizada dd.');
     })
     .catch(err => console.error('Error al sincronizar la BD:', err));
 
-//app.use('/store/api/data/',  require('./routes/dataRouter.js'));
+app.use('/store/api/data/',  require('./routes/dataRouter.js'));
 app.use('/store/api/login', require('./routes/authRouter.js'));
-app.use('/store/api/usuario', require('./routes/usuario'));
+app.use('/store/api/usuario', require('./routes/usuario.js'));
 app.use('/store/api/categoria', require('./routes/categoriaRouter.js'));
 app.use('/store/api/sub_categoria', require('./routes/subCategoriaRouter.js'));
 app.use('/store/api/producto', require('./routes/productoRouter.js'));

@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 
 
 const postUsuarioAdmin = async (req, res) => {
-
+    /*
     if (!req.usuario) {
         res.status(500).json({
             data: undefined,
@@ -12,7 +12,7 @@ const postUsuarioAdmin = async (req, res) => {
         });
         return
     }
-
+*/
     const usuario = req.body;
 
     try {

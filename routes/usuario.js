@@ -4,8 +4,8 @@ const {  postUsuarioAdmin, getUsuarioAdmin, getUsuariosAdmin, updateUsuarioAdmin
 
 const routes = express.Router();
 
-
-routes.post('/', validarJWT,  postUsuarioAdmin);
+//validarJWT
+routes.post('/',  postUsuarioAdmin);
 routes.get('/', validarJWT,  getUsuariosAdmin);
 routes.get('/:id', validarJWT , getUsuarioAdmin);
 routes.put('/:id', validarJWT , updateUsuarioAdmin);
