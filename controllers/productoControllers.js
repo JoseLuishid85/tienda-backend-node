@@ -220,6 +220,20 @@ const listaProductoActivoAdmin = async (req, res) => {
         where: {
             estado: true
         },
+        include:[
+            {
+                model: Categoria,
+                as: 'categoria', 
+            },
+            {
+                model: SubCategoria,
+                as: 'subCategoria', 
+            },
+            {
+                model: Variedad,
+                as: 'variedades', 
+            }
+        ],
         order: [['createdAt', 'DESC']]
     });
 
