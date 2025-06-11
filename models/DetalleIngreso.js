@@ -34,13 +34,13 @@ detalleIngreso.init({
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: Producto,
+            model: Producto,  
             key: 'id'
         }
     },
     variedadId: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: Variedad,
             key: 'id'

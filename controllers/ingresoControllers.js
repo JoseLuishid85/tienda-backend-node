@@ -47,19 +47,28 @@ const registroIngresoAdmin = async (req, res) => {
         for (var item of detalles) {
             item.ingresoId = ingreso.id;
 
-            let variedad = await Variedad.findOne({ where: { id: item.variedadId } });
-            await Variedad.update({ stock: variedad.stock + item.cantidad }, {
-                where: {
-                    id: item.variedadId
-                }
-            });
+            if (item.variedadId) {
+                let variedad = await Variedad.findOne({ where: { id: item.variedadId } });
+                await Variedad.update({ stock: variedad.stock + item.cantidad }, {
+                    where: {
+                        id: item.variedadId
+                    }
+                });
 
-            const sumaStock = await Variedad.sum('stock', { where: { productoId: item.productoId } });
-            await Producto.update({ stock: sumaStock }, {
-                where: {
-                    id: item.productoId
-                }
-            });
+                const sumaStock = await Variedad.sum('stock', { where: { productoId: item.productoId } });
+                await Producto.update({ stock: sumaStock }, {
+                    where: {
+                        id: item.productoId
+                    }
+                });
+            }else{
+                let producto = await Producto.findOne({ where: { id: item.productoId } });
+                await Producto.update({ stock: producto.stock + item.cantidad }, {
+                    where: {
+                        id: item.productoId
+                    }
+                });
+            }
 
             await DetalleIngreso.create(item);
 
@@ -78,7 +87,7 @@ const registroIngresoAdmin = async (req, res) => {
         return res.status(200).json({
             ingreso: newIngreso,
         });
-        
+
     } catch (error) {
         return res.status(500).send({ ok: false, msg: 'Error al procesar datos' });
     }
