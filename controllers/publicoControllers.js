@@ -10,6 +10,16 @@ const obtenerNuevosProductos = async (req,res) => {
         where: {
             estado: true
         },
+        include: [
+            {
+                model: Categoria,
+                as: 'categoria'
+            },
+            {
+                model: SubCategoria,
+                as: 'subCategoria'
+            }
+        ],
         order: [['createdAt', 'DESC']],
         limit: 10
     });
@@ -63,7 +73,7 @@ const obtenerProductosShop = async (req,res) => {
 
 const getCategoriasPublico = async (req, res) => {
 
-    let categoria = await Categoria.findAll({
+    let categorias = await Categoria.findAll({
         where: {
             estado: true
         },
@@ -74,8 +84,21 @@ const getCategoriasPublico = async (req, res) => {
         }
     });
 
+    const categoriasConConteo = await Promise.all(categorias.map(async (categoria) => {
+        const cantidad = await Producto.count({
+            where: {
+                categoriaId: categoria.id,
+                estado: true
+            }
+        });
+        return {
+            ...categoria.toJSON(),
+            cantidad_productos: cantidad
+        };
+    }));
+
     res.status(200).json(
-        categoria
+        categoriasConConteo
     );
 }
 
