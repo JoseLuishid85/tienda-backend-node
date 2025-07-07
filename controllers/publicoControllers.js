@@ -11,7 +11,7 @@ const obtenerNuevosProductos = async (req,res) => {
             estado: true
         },
         order: [['createdAt', 'DESC']],
-        limit: 4
+        limit: 10
     });
 
     res.status(200).json(producto);
@@ -23,6 +23,16 @@ const obtenerProductosRecomendados = async (req,res) => {
         where: {
             estado: true
         },
+        include: [
+            {
+                model: Categoria,
+                as: 'categoria'
+            },
+            {
+                model: SubCategoria,
+                as: 'subCategoria'
+            }
+        ],
         limit: 10
     });
 
