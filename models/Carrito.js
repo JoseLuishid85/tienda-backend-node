@@ -56,7 +56,7 @@ Carrito.init({
     timestamps: true,
 });
 
-
+Carrito.belongsTo(Variedad, { foreignKey: 'variedadId', as: 'variedad' });
 Carrito.belongsTo(Producto, { foreignKey: 'productoId', as: 'productos' });
 Carrito.belongsTo(Cliente, { foreignKey: 'clienteId', as: 'cliente' });
 

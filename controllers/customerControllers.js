@@ -72,7 +72,8 @@ const listaProductoCarritoID = async (req, res) => {
         include: [
             {
                 model: Variedad,
-                as: 'variedad'
+                as: 'variedad',
+                required: false
             },
             {
                 model: Cliente,
@@ -103,22 +104,24 @@ const listaCarritoCliente = async (req, res) => {
         where: {
             clienteId: req.cliente.id
         },
-
         include: [
             {
                 model: Variedad,
-                as: 'variedad'
+                as: 'variedad',
+                required: false
             },
             {
                 model: Cliente,
-                as: 'cliente'
+                as: 'cliente',
+                attributes: {
+                    exclude: ['password']
+                }
             },
             {
                 model: Producto,
                 as: 'productos'
             }
         ],
-        limit: 5,
         order: [['createdAt', 'DESC']]
     });
 
@@ -126,14 +129,19 @@ const listaCarritoCliente = async (req, res) => {
         where: {
             clienteId: req.cliente.id
         },
+
         include: [
             {
                 model: Variedad,
-                as: 'variedad'
+                as: 'variedad',
+                required: false
             },
             {
                 model: Cliente,
-                as: 'cliente'
+                as: 'cliente',
+                attributes: {
+                    exclude: ['password']
+                }
             },
             {
                 model: Producto,

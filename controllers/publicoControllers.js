@@ -4,7 +4,7 @@ const SubCategoria = require('../models/SubCategoria');
 const Variedad = require('../models/Variedad.js');
 const Galeria = require('../models/Galeria.js');
 
-const obtenerNuevosProductos = async (req,res) => {
+const obtenerNuevosProductos = async (req, res) => {
 
     let producto = await Producto.findAll({
         where: {
@@ -25,9 +25,9 @@ const obtenerNuevosProductos = async (req,res) => {
     });
 
     res.status(200).json(producto);
-} 
+}
 
-const obtenerProductosRecomendados = async (req,res) => {
+const obtenerProductosRecomendados = async (req, res) => {
 
     let producto = await Producto.findAll({
         where: {
@@ -49,7 +49,7 @@ const obtenerProductosRecomendados = async (req,res) => {
     res.status(200).json(producto);
 }
 
-const obtenerProductosShop = async (req,res) => {
+const obtenerProductosShop = async (req, res) => {
 
     let producto = await Producto.findAll({
         where: {
@@ -63,6 +63,14 @@ const obtenerProductosShop = async (req,res) => {
             {
                 model: SubCategoria,
                 as: 'subCategoria'
+            },
+            {
+                model: Variedad,
+                as: 'variedades'
+            },
+            {
+                model: Galeria,
+                as: 'galerias'
             }
         ],
         order: [['createdAt', 'DESC']],
@@ -102,7 +110,7 @@ const getCategoriasPublico = async (req, res) => {
     );
 }
 
-const obtenerProductoSlug = async (req,res) => {
+const obtenerProductoSlug = async (req, res) => {
 
     const slug = req.params['slug'];
 
@@ -134,7 +142,7 @@ const obtenerProductoSlug = async (req,res) => {
     res.status(200).json(producto);
 }
 
-const obtenerProductoCategoria = async (req,res) => {
+const obtenerProductoCategoria = async (req, res) => {
 
     const categoriaId = req.params['categoriaId'];
 

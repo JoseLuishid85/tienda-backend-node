@@ -8,7 +8,7 @@ routes.post('/', validarJWTCliente,  crearProductoCarrito);
 
 routes.delete('/:id', validarJWTCliente,  eliminarCarrito);
 
-routes.get('/cliente',validarJWTCliente , listaCarritoCliente);
+routes.get('/cliente',validarJWTCliente , listaCarritoCliente); 
 routes.get('/:id',validarJWTCliente , listaProductoCarritoID);
 
 routes.delete('/cliente/:clienteId', validarJWTCliente, eliminarCarritoCliente );
