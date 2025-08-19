@@ -30,7 +30,7 @@ Carrito.init({
     },
     variedadId: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: Variedad,
             key: 'id'
@@ -57,7 +57,6 @@ Carrito.init({
 });
 
 
-Carrito.belongsTo(Variedad, { foreignKey: 'variedadId', as: 'variedad' });
 Carrito.belongsTo(Producto, { foreignKey: 'productoId', as: 'productos' });
 Carrito.belongsTo(Cliente, { foreignKey: 'clienteId', as: 'cliente' });
 

@@ -14,21 +14,32 @@ const crearProductoCarrito = async (req, res) => {
         });
         return
     }
-    
+
     let data = req.body;
     data.clienteId = req.cliente.id
-    
-    const variedad = await Variedad.findOne({
-        where: {
-            id: data.variedadId
-        }
-    }); 
 
-    if(data.cantidad > variedad.stock){
-        return res.status(500).json({
-            ok: false,
-            msg: 'La cantidad es mayor al stock actual',
+    //Buscar si el producto tiene variedad
+    const variedadPro = await Variedad.findAll({
+        where: {
+            productoId: data.productoId
+        }
+    });
+
+    if (variedadPro.length > 0) {
+        const variedad = await Variedad.findOne({
+            where: {
+                id: data.variedadId
+            }
         });
+
+        if (data.cantidad > variedad.stock) {
+            return res.status(500).json({
+                ok: false,
+                msg: 'La cantidad es mayor al stock actual',
+            });
+        }
+    } else {
+        delete data.variedadId;
     }
 
     await Carrito.sync();
@@ -41,7 +52,7 @@ const crearProductoCarrito = async (req, res) => {
     }
 }
 
-const listaProductoCarritoID = async(req, res) =>{
+const listaProductoCarritoID = async (req, res) => {
 
     if (!req.cliente) {
         res.status(500).json({
@@ -51,7 +62,7 @@ const listaProductoCarritoID = async(req, res) =>{
         });
         return
     }
-    
+
     let id = req.params['id'];
 
     let carrito = await Carrito.findAll({
@@ -77,7 +88,7 @@ const listaProductoCarritoID = async(req, res) =>{
     res.status(200).send(carrito);
 }
 
-const listaCarritoCliente = async(req, res) =>{
+const listaCarritoCliente = async (req, res) => {
 
     if (!req.cliente) {
         res.status(500).json({
@@ -92,7 +103,7 @@ const listaCarritoCliente = async(req, res) =>{
         where: {
             clienteId: req.cliente.id
         },
-        
+
         include: [
             {
                 model: Variedad,
@@ -107,8 +118,8 @@ const listaCarritoCliente = async(req, res) =>{
                 as: 'productos'
             }
         ],
-        limit: 5, 
-        order: [['createdAt', 'DESC']] 
+        limit: 5,
+        order: [['createdAt', 'DESC']]
     });
 
     let carrito_general = await Carrito.findAll({
@@ -129,7 +140,7 @@ const listaCarritoCliente = async(req, res) =>{
                 as: 'productos'
             }
         ],
-        order: [['createdAt', 'DESC']] 
+        order: [['createdAt', 'DESC']]
     });
 
     res.status(200).send({
@@ -160,8 +171,8 @@ const eliminarCarrito = async (req, res) => {
 
         await carrito.destroy();
 
-        res.status(200).json({ 
-            msg:'El registro fue eliminada con exito',
+        res.status(200).json({
+            msg: 'El registro fue eliminada con exito',
         });
     } catch (error) {
         return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
@@ -193,8 +204,8 @@ const eliminarCarritoCliente = async (req, res) => {
             await carrito.destroy();
         }
 
-        res.status(200).json({ 
-            msg:'El registro fue eliminada con exito',
+        res.status(200).json({
+            msg: 'El registro fue eliminada con exito',
         });
     } catch (error) {
         return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });

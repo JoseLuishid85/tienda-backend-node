@@ -14,7 +14,7 @@ sequelize.sync({ alter: true })
     })
     .catch(err => console.error('Error al sincronizar la BD:', err));
 
-//app.use('/store/api/data/',  require('./routes/dataRouter.js'));
+app.use('/store/api/data/',  require('./routes/dataRouter.js'));
 app.use('/store/api/login', require('./routes/authRouter.js'));
 app.use('/store/api/usuario', require('./routes/usuario.js'));
 app.use('/store/api/categoria', require('./routes/categoriaRouter.js'));
