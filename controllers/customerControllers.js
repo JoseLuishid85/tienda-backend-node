@@ -77,7 +77,10 @@ const listaProductoCarritoID = async (req, res) => {
             },
             {
                 model: Cliente,
-                as: 'cliente'
+                as: 'cliente',
+                attributes: {
+                    exclude: ['password']
+                }
             },
             {
                 model: Producto,
@@ -157,6 +160,46 @@ const listaCarritoCliente = async (req, res) => {
     });
 }
 
+const actualizarCarrito = async (req, res) =>{
+    if (!req.cliente) {
+        res.status(500).json({
+            data: undefined,
+            msg: 'Error Token',
+            dd: req.cliente
+        });
+        return
+    }
+
+    let data = req.body;
+    let id = parseInt(req.params['id']);
+
+    try {
+        const carrito = await Carrito.findOne({ where: { id: id } });
+        
+        if (!carrito) {
+            return res.status(404).send({ data: undefined, msg: 'Item no existe en la base de datos' });
+        }
+
+        await Carrito.update(data, {
+            where: { id: id }
+        });
+
+        const itemActu = await Carrito.findOne({ where: { id: id } });
+
+        return res.status(200).json({
+            data: itemActu
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ 
+            ok: false, 
+            data: undefined, 
+            msg: 'Error al procesar datos',
+            error: error.message 
+        });
+    }
+}
+
 const eliminarCarrito = async (req, res) => {
 
     if (!req.cliente) {
@@ -225,6 +268,7 @@ module.exports = {
     crearProductoCarrito,
     listaProductoCarritoID,
     listaCarritoCliente,
+    actualizarCarrito,
     eliminarCarrito,
     eliminarCarritoCliente
 }
