@@ -109,7 +109,7 @@ const obtenerDireccionCliente = async (req, res) => {
     let id = req.params['id'];
 
     try {
-        let direccion = await Direccion.findOne({
+        let direccion = await Direccion.findAll({
             where: {
                 clienteId: id
             }
