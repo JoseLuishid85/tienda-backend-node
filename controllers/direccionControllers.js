@@ -95,6 +95,44 @@ const obtenerDireccion = async (req, res) => {
     }
 }
 
+const obtenerDireccionCliente = async (req, res) => {
+
+    if (!req.cliente) {
+        res.status(500).json({
+            data: undefined,
+            msg: 'Error Token',
+            dd: req.cliente
+        });
+        return
+    }
+
+    let id = req.params['id'];
+
+    try {
+        let direccion = await Direccion.findOne({
+            where: {
+                clienteId: id
+            }
+        });
+
+        if (!direccion) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'El cliente no tiene  dirección en la base de dato',
+            });
+        }
+
+        res.status(200).send(direccion);
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Error al procesar datos',
+        })
+    }
+}
+
 const actualizarDireccion = async (req, res) => {
     
     if (!req.cliente) {
@@ -184,6 +222,7 @@ module.exports = {
     getDirecciones,
     crearDireccionCliente,
     obtenerDireccion,
+    obtenerDireccionCliente,
     actualizarDireccion,
     eliminarDireccion
 }

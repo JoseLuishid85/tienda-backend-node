@@ -11,9 +11,17 @@ Venta.init({
         primaryKey: true,
         autoIncrement: true
     },
-    serie: {
-        type: DataTypes.INTEGER,
+    nventa: {
+        type: DataTypes.STRING,
         allowNull: false
+    },
+    forma_pago: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    banco: {
+        type: DataTypes.STRING,
+        allowNull: true
     },
     transaccion: {
         type: DataTypes.STRING,

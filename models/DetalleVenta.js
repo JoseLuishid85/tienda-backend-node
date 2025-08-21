@@ -30,7 +30,7 @@ DetalleVenta.init({
     },
     variedadId:{
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: Variedad,
             key: 'id'

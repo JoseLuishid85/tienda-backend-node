@@ -15,7 +15,7 @@ const crearVenta = async (req, res) => {
 
     let data = req.body;
 
-    data.serie = "1234";
+    data.nventa = "1234";
     data.estado = "Activo"
 
     var currentDate = new Date();

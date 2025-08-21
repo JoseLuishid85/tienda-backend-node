@@ -10,16 +10,8 @@ Direccion.init({
         primaryKey: true,
         autoIncrement: true
     },
-    nombres: {
-        type: DataTypes.STRING(50),
-        allowNull: false
-    },
-    apellidos: {
-        type: DataTypes.STRING(50),
-        allowNull: true 
-    },
-    documento: {
-        type: DataTypes.STRING(50),
+    direccion: {
+        type: DataTypes.STRING(200),
         allowNull: false,
     },
     telefono: {
@@ -36,10 +28,6 @@ Direccion.init({
     },
     zip: {
         type: DataTypes.STRING(50),
-        allowNull: false,
-    },
-    direccion: {
-        type: DataTypes.STRING(200),
         allowNull: false,
     },
     clienteId: {
