@@ -3,6 +3,7 @@ const Categoria = require('../models/Categoria');
 const SubCategoria = require('../models/SubCategoria');
 const Variedad = require('../models/Variedad.js');
 const Galeria = require('../models/Galeria.js');
+const Banco = require('../models/Banco.js');
 
 const obtenerNuevosProductos = async (req, res) => {
 
@@ -175,6 +176,22 @@ const obtenerProductoCategoria = async (req, res) => {
     res.status(200).json(producto);
 }
 
+const getBancosPublico = async (req, res) => {
+
+    let bancos = await Banco.findAll({
+        where: {
+            estado: true
+        },
+        order: [['nombre', 'ASC']]
+    });
+
+
+    res.status(200).json(
+        bancos
+    );
+}
+
+
 
 module.exports = {
     obtenerNuevosProductos,
@@ -183,4 +200,5 @@ module.exports = {
     getCategoriasPublico,
     obtenerProductoSlug,
     obtenerProductoCategoria,
+    getBancosPublico
 }

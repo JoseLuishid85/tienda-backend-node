@@ -30,6 +30,7 @@ app.use('/store/api/publico/',  require('./routes/publicoRouter.js'));
 app.use('/store/api/customer/',  require('./routes/customerRouter.js'));
 app.use('/store/api/venta/',  require('./routes/ventaRouter.js'));
 app.use('/store/api/detalleventa/',  require('./routes/detalleventaRouter.js'));
+app.use('/store/api/banco/',  require('./routes/bancoRouter.js'));
 
 app.use(express.urlencoded({ extended: true }));
 
