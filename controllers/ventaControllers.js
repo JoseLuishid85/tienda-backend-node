@@ -1,5 +1,8 @@
 const { Op } = require('sequelize');
 const Venta = require('../models/Venta');
+//const DetalleVenta = require('../models/DetalleVenta');
+const Cliente = require('../models/Cliente');
+const Direccion = require('../models/Direccion');
 const DetalleVenta = require('../models/DetalleVenta');
 
 const crearVenta = async (req, res) => {
@@ -15,13 +18,21 @@ const crearVenta = async (req, res) => {
 
     let data = req.body;
 
-    data.nventa = "1234";
-    data.estado = "Activo"
+    const lastVenta = await Venta.findOne({
+        order: [['id', 'DESC']], 
+        limit: 1 
+    });
+
+    const nextId = lastVenta ? lastVenta.id + 1 : 1;
+
+    const codigoSecuencial = String(nextId).padStart(6, '0');
+    data.nventa = `V${codigoSecuencial}`;
+    data.estado = "Pendiente"
 
     var currentDate = new Date();
 
     data.year = currentDate.getFullYear();
-    data.month = currentDate.getMonth() + 1; 
+    data.month = currentDate.getMonth() + 1;
     data.day = currentDate.getDate();
 
     await Venta.sync();
@@ -43,26 +54,72 @@ const crearVenta = async (req, res) => {
     }
 
 }
-/*
-const getVentas = async (req, res) => {
 
+const getVentas = async (req, res) => {
     if (!req.cliente) {
-        res.status(500).json({
+        return res.status(500).json({
             data: undefined,
             msg: 'Error Token',
             dd: req.cliente
         });
-        return
     }
 
-    let ventas = await Venta.findAll({
-        order: [['id', 'ASC']],
-        include: [Cliente, Direccion],
-    });
+    try {
+        let ventas = await Venta.findAll({
+            where: {
+                clienteId: req.cliente.id
+            },
+            include: [
+                {
+                    model: Cliente,
+                    as: 'cliente',
+                },
+                {
+                    model: Direccion,
+                    as: 'direccion'
+                },
+                {
+                    model: DetalleVenta,
+                    as: 'detalles',
+                }
+            ]
+        });
 
-    res.status(200).json(
-        ventas
-    );
+        const totales = ventas.reduce((acc, venta) => {
+            acc.totalPedidos += 1; // Contamos todas las ventas
+
+            switch (venta.estado) {
+                case 'En Proceso':
+                    acc.enProceso += 1;
+                    break;
+                case 'Entregado': // Asegúrate de que el string coincida con el valor en la DB
+                    acc.entregados += 1;
+                    break;
+                case 'Pendiente': // Asegúrate de que el string coincida con el valor en la DB
+                    acc.pendientes += 1;
+                    break;
+                // Puedes agregar más estados si los tienes (e.g., 'Cancelado')
+            }
+            return acc;
+        }, {
+            totalPedidos: 0,
+            enProceso: 0,
+            entregados: 0,
+            pendientes: 0
+        });
+
+        res.status(200).json({
+            totales: totales,
+            ventas: ventas
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Error al obtener las ventas y totales.',
+        });
+    }
 }
 
 const obtenerVenta = async (req, res) => {
@@ -83,7 +140,21 @@ const obtenerVenta = async (req, res) => {
             where: {
                 id: id
             },
-            include: [Cliente, Direccion, DetalleVenta]
+
+            include: [
+                {
+                    model: Cliente,
+                    as: 'cliente',
+                },
+                {
+                    model: Direccion,
+                    as: 'direccion'
+                },
+                {
+                    model: DetalleVenta,
+                    as: 'detalles',
+                }
+            ]
         });
 
         if (!venta) {
@@ -106,11 +177,11 @@ const obtenerVenta = async (req, res) => {
 
 const obtenerVentaTransaccion = async (req, res) => {
 
-    if (!req.cliente) {
+    if (!req.usuario) {
         res.status(500).json({
             data: undefined,
             msg: 'Error Token',
-            dd: req.cliente
+            dd: req.usuario
         });
         return
     }
@@ -122,7 +193,20 @@ const obtenerVentaTransaccion = async (req, res) => {
             where: {
                 transaccion: id_payment
             },
-            include: [Cliente, Direccion]
+            include: [
+                {
+                    model: Cliente,
+                    as: 'cliente',
+                },
+                {
+                    model: Direccion,
+                    as: 'direccion'
+                },
+                {
+                    model: DetalleVenta,
+                    as: 'detalles',
+                }
+            ]
         });
 
         if (!venta) {
@@ -145,11 +229,11 @@ const obtenerVentaTransaccion = async (req, res) => {
 
 const getVentasCliente = async (req, res) => {
 
-    if (!req.cliente) {
+    if (!req.usuario) {
         res.status(500).json({
             data: undefined,
             msg: 'Error Token',
-            dd: req.cliente
+            dd: req.usuario
         });
         return
     }
@@ -157,9 +241,22 @@ const getVentasCliente = async (req, res) => {
     let id_cliente = req.params['id_cliente'];
 
     let ventas = await Venta.findAll({
-        where: { id_cliente: id_cliente },
+        where: { clienteId: id_cliente },
         order: [['createdAt', 'DESC']],
-        include: [Cliente, Direccion],
+        include: [
+            {
+                model: Cliente,
+                as: 'cliente',
+            },
+            {
+                model: Direccion,
+                as: 'direccion'
+            },
+            {
+                model: DetalleVenta,
+                as: 'detalles',
+            }
+        ]
     });
 
     res.status(200).json(
@@ -178,10 +275,22 @@ const getVentasAdmin = async (req, res) => {
         return
     }
 
-    
     let ventas = await Venta.findAll({
         order: [['id', 'ASC']],
-        include: [Cliente, Direccion],
+        include: [
+            {
+                model: Cliente,
+                as: 'cliente',
+            },
+            {
+                model: Direccion,
+                as: 'direccion'
+            },
+            {
+                model: DetalleVenta,
+                as: 'detalles',
+            }
+        ]
     });
 
     res.status(200).json(
@@ -208,11 +317,17 @@ const obtenerVentaAdmin = async (req, res) => {
                 id: id
             },
             include: [
-                { model: Cliente },
-                { model: Direccion },
+                {
+                    model: Cliente,
+                    as: 'cliente',
+                },
+                {
+                    model: Direccion,
+                    as: 'direccion'
+                },
                 {
                     model: DetalleVenta,
-                    include: [Producto]
+                    as: 'detalles',
                 }
             ]
         });
@@ -234,14 +349,13 @@ const obtenerVentaAdmin = async (req, res) => {
         })
     }
 }
-*/
 
 module.exports = {
     crearVenta,
-    //getVentas,
-    //obtenerVenta,
-    //obtenerVentaTransaccion,
-    //getVentasCliente,
-    //getVentasAdmin,
-    //obtenerVentaAdmin
+    getVentas,
+    obtenerVenta,
+    obtenerVentaTransaccion,
+    getVentasCliente,
+    getVentasAdmin,
+    obtenerVentaAdmin
 }

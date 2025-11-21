@@ -41,7 +41,7 @@ Venta.init({
     },
     estado: {
         type: DataTypes.STRING,
-        defaultValue: true,
+        defaultValue: 'Pendiente',
         allowNull: false
     },
     year: {
@@ -81,6 +81,5 @@ Venta.init({
 
 Venta.belongsTo(Cliente, { foreignKey: 'clienteId', as: 'cliente' });
 Venta.belongsTo(Direccion, { foreignKey: 'direccionId', as: 'direccion' });
-
 
 module.exports = Venta;

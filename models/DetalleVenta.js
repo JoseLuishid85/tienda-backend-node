@@ -52,9 +52,11 @@ DetalleVenta.init({
     timestamps: true,
 });
 
-DetalleVenta.belongsTo(Venta, { foreignKey: 'ventaId', as: 'venta' });
 DetalleVenta.belongsTo(Producto, { foreignKey: 'productoId', as: 'producto' });
 DetalleVenta.belongsTo(Variedad, { foreignKey: 'variedadId', as: 'variedad' });
+
+Venta.hasMany(DetalleVenta, { foreignKey: 'ventaId', as: 'detalles' });
+DetalleVenta.belongsTo(Venta, { foreignKey: 'ventaId', as: 'venta' });
 
 
 module.exports = DetalleVenta;
