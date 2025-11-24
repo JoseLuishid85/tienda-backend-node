@@ -26,9 +26,9 @@ const crearDB = async (req, res) => {
     //await DetalleIngreso.sync();
     //await Cliente.sync();
     //await Direccion.sync();
-    await Carrito.sync();
-    //await Venta.sync();
-    //await DetalleVenta.sync();
+    //await Carrito.sync();
+    await Venta.sync();
+    await DetalleVenta.sync();
 
     return res.status(200).send({ msg: "Todo bien" });
 

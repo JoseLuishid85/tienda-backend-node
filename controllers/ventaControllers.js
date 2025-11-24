@@ -1,9 +1,9 @@
 const { Op } = require('sequelize');
 const Venta = require('../models/Venta');
-//const DetalleVenta = require('../models/DetalleVenta');
 const Cliente = require('../models/Cliente');
 const Direccion = require('../models/Direccion');
 const DetalleVenta = require('../models/DetalleVenta');
+const Producto = require('../models/Producto');
 
 const crearVenta = async (req, res) => {
 
@@ -19,8 +19,8 @@ const crearVenta = async (req, res) => {
     let data = req.body;
 
     const lastVenta = await Venta.findOne({
-        order: [['id', 'DESC']], 
-        limit: 1 
+        order: [['id', 'DESC']],
+        limit: 1
     });
 
     const nextId = lastVenta ? lastVenta.id + 1 : 1;
@@ -81,24 +81,29 @@ const getVentas = async (req, res) => {
                 {
                     model: DetalleVenta,
                     as: 'detalles',
+                    include: [
+                        {
+                            model: Producto,
+                            as: 'producto'
+                        }
+                    ]
                 }
             ]
         });
 
         const totales = ventas.reduce((acc, venta) => {
-            acc.totalPedidos += 1; // Contamos todas las ventas
+            acc.totalPedidos += 1;
 
             switch (venta.estado) {
                 case 'En Proceso':
                     acc.enProceso += 1;
                     break;
-                case 'Entregado': // Asegúrate de que el string coincida con el valor en la DB
+                case 'Entregado':
                     acc.entregados += 1;
                     break;
-                case 'Pendiente': // Asegúrate de que el string coincida con el valor en la DB
+                case 'Pendiente':
                     acc.pendientes += 1;
                     break;
-                // Puedes agregar más estados si los tienes (e.g., 'Cancelado')
             }
             return acc;
         }, {
@@ -153,6 +158,12 @@ const obtenerVenta = async (req, res) => {
                 {
                     model: DetalleVenta,
                     as: 'detalles',
+                    include: [
+                        {
+                            model: Producto,
+                            as: 'producto'
+                        }
+                    ]
                 }
             ]
         });
