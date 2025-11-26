@@ -2,6 +2,7 @@ const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../config/database');
 const Cliente = require('./Cliente');
 const Direccion = require('./Direccion');
+const Banco = require('./Banco');
 
 class Venta extends Model {}
 
@@ -19,9 +20,13 @@ Venta.init({
         type: DataTypes.STRING,
         allowNull: false
     },
-    banco: {
-        type: DataTypes.STRING,
-        allowNull: true
+    bancoId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: Banco,
+            key: 'id'
+        }
     },
     transaccion: {
         type: DataTypes.STRING,
@@ -81,5 +86,6 @@ Venta.init({
 
 Venta.belongsTo(Cliente, { foreignKey: 'clienteId', as: 'cliente' });
 Venta.belongsTo(Direccion, { foreignKey: 'direccionId', as: 'direccion' });
+Venta.belongsTo(Banco, { foreignKey: 'bancoId', as: 'banco' });
 
 module.exports = Venta;

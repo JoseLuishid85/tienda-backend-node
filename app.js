@@ -1,11 +1,17 @@
 const express = require('express');
 const cors = require('cors');
+const http = require('http');
 const app = express();
+const server = http.createServer(app);
 const sequelize = require('./config/database');
+const setupSocketIO = require('./config/socket');
 
 require('dotenv').config();
 app.use(express.json());
 app.use(cors());
+
+// Configurar Socket.IO
+setupSocketIO(server);
 
 //force: false alter: true
 sequelize.sync({ alter: false }) 
@@ -14,8 +20,8 @@ sequelize.sync({ alter: false })
     })
     .catch(err => console.error('Error al sincronizar la BD:', err));
 
-//app.use('/store/api/data/',  require('./routes/dataRouter.js'));
-
+app.use('/store/api/data/',  require('./routes/dataRouter.js'));
+/*
 app.use('/store/api/login', require('./routes/authRouter.js'));
 app.use('/store/api/usuario', require('./routes/usuario.js'));
 app.use('/store/api/categoria', require('./routes/categoriaRouter.js'));
@@ -33,10 +39,11 @@ app.use('/store/api/venta',  require('./routes/ventaRouter.js'));
 app.use('/store/api/detalleventa',  require('./routes/detalleventaRouter.js'));
 app.use('/store/api/banco',  require('./routes/bancoRouter.js'));
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));*/
 
 const PORT = 4000;
- 
-app.listen(PORT, () => {
+
+server.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Socket.IO listo para conexiones`);
 });

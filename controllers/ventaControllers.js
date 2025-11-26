@@ -4,6 +4,7 @@ const Cliente = require('../models/Cliente');
 const Direccion = require('../models/Direccion');
 const DetalleVenta = require('../models/DetalleVenta');
 const Producto = require('../models/Producto');
+const Banco = require('../models/Banco');
 
 const crearVenta = async (req, res) => {
 
@@ -48,9 +49,46 @@ const crearVenta = async (req, res) => {
             await DetalleVenta.create(item);
         }
 
-        return res.status(200).json({ venta: newVenta });
+        // Obtener la venta completa con sus relaciones para enviar por Socket.IO
+        const ventaCompleta = await Venta.findOne({
+            where: { id: newVenta.id },
+            include: [
+                {
+                    model: Cliente,
+                    as: 'cliente',
+                },
+                {
+                    model: Direccion,
+                    as: 'direccion'
+                },
+                {
+                    model: Banco,
+                    as: 'banco'
+                },
+                {
+                    model: DetalleVenta,
+                    as: 'detalles',
+                    include: [
+                        {
+                            model: Producto,
+                            as: 'producto'
+                        }
+                    ]
+                }
+            ]
+        });
+
+        if (global.io) {
+            global.io.emit('nueva-venta', {
+                venta: ventaCompleta,
+                mensaje: `Nueva venta ${newVenta.nventa} realizada`
+            });
+            console.log(`Evento 'nueva-venta' emitido: ${newVenta.nventa}`);
+        }
+
+        return res.status(200).json({ venta: ventaCompleta });
     } catch (error) {
-        return res.status(500).json({ ok: false, data: undefined, msg: 'Error al procesar datos' });
+        return res.status(500).json({ ok: false, error: error, msg: 'Error al procesar datos' });
     }
 
 }
