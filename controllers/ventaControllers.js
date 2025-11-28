@@ -1,10 +1,10 @@
-const { Op } = require('sequelize');
 const Venta = require('../models/Venta');
 const Cliente = require('../models/Cliente');
 const Direccion = require('../models/Direccion');
 const DetalleVenta = require('../models/DetalleVenta');
 const Producto = require('../models/Producto');
 const Banco = require('../models/Banco');
+const { Op } = require('sequelize');
 
 const crearVenta = async (req, res) => {
 
@@ -399,6 +399,59 @@ const obtenerVentaAdmin = async (req, res) => {
     }
 }
 
+const getVentasDiaAdmin = async (req, res) => {
+
+    if (!req.usuario) {
+        return res.status(500).json({
+            data: undefined,
+            msg: 'Error Token',
+            dd: req.usuario
+        });
+    }
+
+    const currentDate = new Date();
+
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth() + 1;
+    const day = currentDate.getDate();
+
+    try {
+        let ventas = await Venta.findAll({
+            where: {
+                year: year,
+                month: month,
+                day: day
+            },
+            order: [['id', 'ASC']],
+            include: [
+                {
+                    model: Cliente,
+                    as: 'cliente',
+                },
+                {
+                    model: Direccion,
+                    as: 'direccion'
+                },
+                {
+                    model: DetalleVenta,
+                    as: 'detalles',
+                }
+            ]
+        });
+
+        res.status(200).json(
+            ventas
+        );
+    } catch (error) {
+        console.error('Error al obtener las ventas del día:', error);
+        res.status(500).json({
+            data: undefined,
+            msg: 'Error en la base de datos al buscar ventas.',
+            error: error.message
+        });
+    }
+}
+
 module.exports = {
     crearVenta,
     getVentas,
@@ -406,5 +459,6 @@ module.exports = {
     obtenerVentaTransaccion,
     getVentasCliente,
     getVentasAdmin,
-    obtenerVentaAdmin
+    obtenerVentaAdmin,
+    getVentasDiaAdmin
 }
