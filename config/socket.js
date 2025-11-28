@@ -10,7 +10,8 @@ function setupSocketIO(server) {
         cors: {
             origin: "*", // En producción, especifica el dominio del frontend
             methods: ["GET", "POST"]
-        }
+        },
+        path: '/store/socket.io/',
     });
 
     // Evento de conexión
