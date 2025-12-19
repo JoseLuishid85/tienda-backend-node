@@ -4,7 +4,8 @@ const Direccion = require('../models/Direccion');
 const DetalleVenta = require('../models/DetalleVenta');
 const Producto = require('../models/Producto');
 const Banco = require('../models/Banco');
-const { Op } = require('sequelize');
+const { Op, fn, col } = require('sequelize');
+const moment = require('moment');
 
 const crearVenta = async (req, res) => {
 
@@ -451,6 +452,155 @@ const getVentasDiaAdmin = async (req, res) => {
         });
     }
 }
+/*
+const getReporteVentas = async (req, res) => {
+    if (!req.usuario) {
+        return res.status(401).json({ msg: 'No autorizado - Error Token' });
+    }
+
+    try {
+        const { mes, year, semana } = req.query;
+        let whereClause = {};
+
+        if (mes && year) {
+            // Filtrar por mes específico
+            whereClause.month = mes;
+            whereClause.year = year;
+        } else if (semana) {
+            // Filtrar por número de semana (requiere que el front envíe el año también)
+            // Si no usas una columna "semana" en DB, calculamos el rango de fechas:
+            const inicioSemana = moment().week(semana).startOf('week').toDate();
+            const finSemana = moment().week(semana).endOf('week').toDate();
+            
+            whereClause.createdAt = {
+                [Op.between]: [inicioSemana, finSemana]
+            };
+        } else {
+            // 2. Default: Últimas 3 semanas
+            const haceTresSemanas = new Date();
+            haceTresSemanas.setDate(haceTresSemanas.getDate() - 21);
+
+            whereClause.createdAt = {
+                [Op.gte]: haceTresSemanas
+            };
+        }
+
+        const ventas = await Venta.findAll({
+            where: whereClause,
+            order: [['createdAt', 'DESC']], // Más útil ver lo más reciente primero
+            include: [
+                { model: Cliente, as: 'cliente' },
+                { model: Direccion, as: 'direccion' },
+                { model: DetalleVenta, as: 'detalles' }
+            ]
+        });
+
+        res.status(200).json(ventas);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: 'Error al obtener el reporte de ventas' });
+    }
+}
+    */
+
+const getReporteVentas = async (req, res) => {
+    try {
+        const {
+            tipoPeriodo, fechaEspecifica, semana, mes,
+            anioMes, anio, fechaInicio, fechaFin,
+            estado, metodoPago
+        } = req.query;
+
+        let whereClause = {};
+
+        // 1. LÓGICA DE FILTRADO POR PERÍODO
+        switch (tipoPeriodo) {
+            case 'dia':
+                if (fechaEspecifica) {
+                    whereClause.createdAt = {
+                        [Op.between]: [
+                            moment(fechaEspecifica).startOf('day').toDate(),
+                            moment(fechaEspecifica).endOf('day').toDate()
+                        ]
+                    };
+                }
+                break;
+            
+        case 'semana':
+            if (semana) {
+                // El formato de input "week" es "2024-W12"
+                const [year, weekNum] = semana.split('-W');
+                const startOfWeek = moment().year(year).isoWeek(weekNum).startOf('isoWeek');
+                const endOfWeek = moment().year(year).isoWeek(weekNum).endOf('isoWeek');
+                whereClause.createdAt = { [Op.between]: [startOfWeek.toDate(), endOfWeek.toDate()] };
+            }
+            break;
+
+        case 'mes':
+            if (mes && anioMes) {
+                const startOfMonth = moment(`${anioMes}-${mes}`, "YYYY-MM").startOf('month');
+                const endOfMonth = moment(`${anioMes}-${mes}`, "YYYY-MM").endOf('month');
+                whereClause.createdAt = { [Op.between]: [startOfMonth.toDate(), endOfMonth.toDate()] };
+            }
+            break;
+
+        case 'anio':
+            if (anio) {
+                const startOfYear = moment(anio, "YYYY").startOf('year');
+                const endOfYear = moment(anio, "YYYY").endOf('year');
+                whereClause.createdAt = { [Op.between]: [startOfYear.toDate(), endOfYear.toDate()] };
+            }
+            break;
+
+        case 'rango':
+            if (fechaInicio && fechaFin) {
+                whereClause.createdAt = {
+                    [Op.between]: [
+                        moment(fechaInicio).startOf('day').toDate(),
+                        moment(fechaFin).endOf('day').toDate()
+                    ]
+                };
+            }
+            break;
+        }
+
+        // 2. FILTROS ADICIONALES (Estado y Método de Pago)
+        if (estado) whereClause.estado = estado;
+        if (metodoPago) whereClause.forma_pago = metodoPago;
+
+        // 3. CONSULTA CON DETALLES Y ESTADÍSTICAS
+        const ventas = await Venta.findAll({
+            where: whereClause,
+            include: [
+                { model: Cliente, as: 'cliente' },
+                { model: DetalleVenta, as: 'detalles' }
+            ],
+            order: [['createdAt', 'DESC']]
+        });
+
+        // 4. CALCULAR ESTADÍSTICAS EN EL SERVIDOR (Opcional, pero recomendado)
+        const estadisticas = {
+            totalVentas: ventas.length,
+            montoTotal: ventas.reduce((acc, v) => acc + parseFloat(v.total), 0),
+            totalProductos: ventas.reduce((acc, v) => acc + v.detalles.length, 0),
+        };
+
+        estadisticas.promedioVenta = estadisticas.totalVentas > 0
+            ? estadisticas.montoTotal / estadisticas.totalVentas
+            : 0;
+
+        res.status(200).json({
+            ok: true,
+            estadisticas,
+            ventas
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ ok: false, msg: 'Error al consultar ventas' });
+    }
+};
 
 module.exports = {
     crearVenta,
@@ -460,5 +610,6 @@ module.exports = {
     getVentasCliente,
     getVentasAdmin,
     obtenerVentaAdmin,
-    getVentasDiaAdmin
+    getVentasDiaAdmin,
+    getReporteVentas
 }

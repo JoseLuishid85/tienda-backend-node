@@ -10,13 +10,15 @@ const {
     getVentasCliente,
     getVentasAdmin,
     obtenerVentaAdmin,
-    getVentasDiaAdmin
+    getVentasDiaAdmin,
+    getReporteVentas
 } = require('../controllers/ventaControllers.js')
  
 
 const routes = express.Router();
 
 routes.get('/admin', validarJWT,  getVentasAdmin);
+routes.get('/report', validarJWT,  getReporteVentas);
 routes.get('/day', validarJWT,  getVentasDiaAdmin);
 routes.get('/admin/:id', validarJWT,  obtenerVentaAdmin);
 

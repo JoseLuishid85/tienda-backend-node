@@ -1,17 +1,12 @@
 const { Server } = require('socket.io');
 
-/**
- * Configura Socket.IO con el servidor HTTP
- * @param {http.Server} server - Servidor HTTP de Node.js
- * @returns {Server} - Instancia de Socket.IO
- */
 function setupSocketIO(server) {
     const io = new Server(server, {
         cors: {
             origin: "*", // En producción, especifica el dominio del frontend
             methods: ["GET", "POST"]
         },
-        path: '/store/socket.io/',
+        //path: '/store/socket.io/',
     });
 
     // Evento de conexión
