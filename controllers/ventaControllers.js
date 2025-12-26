@@ -452,57 +452,6 @@ const getVentasDiaAdmin = async (req, res) => {
         });
     }
 }
-/*
-const getReporteVentas = async (req, res) => {
-    if (!req.usuario) {
-        return res.status(401).json({ msg: 'No autorizado - Error Token' });
-    }
-
-    try {
-        const { mes, year, semana } = req.query;
-        let whereClause = {};
-
-        if (mes && year) {
-            // Filtrar por mes específico
-            whereClause.month = mes;
-            whereClause.year = year;
-        } else if (semana) {
-            // Filtrar por número de semana (requiere que el front envíe el año también)
-            // Si no usas una columna "semana" en DB, calculamos el rango de fechas:
-            const inicioSemana = moment().week(semana).startOf('week').toDate();
-            const finSemana = moment().week(semana).endOf('week').toDate();
-            
-            whereClause.createdAt = {
-                [Op.between]: [inicioSemana, finSemana]
-            };
-        } else {
-            // 2. Default: Últimas 3 semanas
-            const haceTresSemanas = new Date();
-            haceTresSemanas.setDate(haceTresSemanas.getDate() - 21);
-
-            whereClause.createdAt = {
-                [Op.gte]: haceTresSemanas
-            };
-        }
-
-        const ventas = await Venta.findAll({
-            where: whereClause,
-            order: [['createdAt', 'DESC']], // Más útil ver lo más reciente primero
-            include: [
-                { model: Cliente, as: 'cliente' },
-                { model: Direccion, as: 'direccion' },
-                { model: DetalleVenta, as: 'detalles' }
-            ]
-        });
-
-        res.status(200).json(ventas);
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ msg: 'Error al obtener el reporte de ventas' });
-    }
-}
-    */
 
 const getReporteVentas = async (req, res) => {
     try {

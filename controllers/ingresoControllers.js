@@ -2,8 +2,12 @@ const Producto = require('../models/Producto.js')
 const Variedad = require('../models/Variedad.js');
 const Ingreso = require('../models/Ingreso.js');
 const DetalleIngreso = require('../models/DetalleIngreso.js');
+const Proveedor = require('../models/Proveedor.js');
+
 const fs = require('fs');
 const path = require('path');
+const { Op } = require('sequelize');
+const moment = require('moment');
 
 const registroIngresoAdmin = async (req, res) => {
 
@@ -61,7 +65,7 @@ const registroIngresoAdmin = async (req, res) => {
                         id: item.productoId
                     }
                 });
-            }else{
+            } else {
                 let producto = await Producto.findOne({ where: { id: item.productoId } });
                 await Producto.update({ stock: producto.stock + item.cantidad }, {
                     where: {
@@ -198,10 +202,118 @@ const obtenerDocumentoIngreso = async (req, res) => {
 
 }
 
+const reportIngresosAdmin = async (req, res) => {
+    try {
+        if (!req.usuario) {
+            return res.status(500).json({ ok: false, msg: 'Error Token' });
+        }
+
+
+        const {
+            tipoPeriodo, fechaEspecifica, semana, mes,
+            anioMes, anio, fechaInicio, fechaFin,
+            proveedorId
+        } = req.query;
+
+        let whereClause = {};
+
+        // --- LÓGICA DE FILTRADO POR PERÍODO (Igual que en ventas) ---
+        switch (tipoPeriodo) {
+            case 'dia':
+                if (fechaEspecifica) {
+                    whereClause.createdAt = {
+                        [Op.between]: [
+                            moment(fechaEspecifica).startOf('day').toDate(),
+                            moment(fechaEspecifica).endOf('day').toDate()
+                        ]
+                    };
+                }
+                break;
+            case 'semana':
+                if (semana) {
+                    const [year, weekNum] = semana.split('-W');
+                    whereClause.createdAt = {
+                        [Op.between]: [
+                            moment().year(year).isoWeek(weekNum).startOf('isoWeek').toDate(),
+                            moment().year(year).isoWeek(weekNum).endOf('isoWeek').toDate()
+                        ]
+                    };
+                }
+                break;
+            case 'mes':
+                if (mes && anioMes) {
+                    whereClause.createdAt = {
+                        [Op.between]: [
+                            moment(`${anioMes}-${mes}`, "YYYY-MM").startOf('month').toDate(),
+                            moment(`${anioMes}-${mes}`, "YYYY-MM").endOf('month').toDate()
+                        ]
+                    };
+                }
+                break;
+            case 'anio':
+                if (anio) {
+                    whereClause.createdAt = {
+                        [Op.between]: [
+                            moment(anio, "YYYY").startOf('year').toDate(),
+                            moment(anio, "YYYY").endOf('year').toDate()
+                        ]
+                    };
+                }
+                break;
+            case 'rango':
+                if (fechaInicio && fechaFin) {
+                    whereClause.createdAt = {
+                        [Op.between]: [
+                            moment(fechaInicio).startOf('day').toDate(),
+                            moment(fechaFin).endOf('day').toDate()
+                        ]
+                    };
+                }
+                break;
+        }
+
+        // Filtro por proveedor opcional
+        //if (proveedorId) whereClause.proveedorId = proveedorId;
+
+        // --- CONSULTA ---
+        const ingresos = await Ingreso.findAll({
+            where: whereClause,
+            order: [['createdAt', 'DESC']],
+            include: [
+                { model: DetalleIngreso, as: 'detalles' },
+                { model: Proveedor, as: 'proveedorInfo', attributes: ['id', 'nombre', 'rif'] },
+               // { model: Usuario, as: 'usuario', attributes: ['nombres'] } 
+            ]
+        });
+
+        // --- CÁLCULO DE ESTADÍSTICAS ---
+        
+        const estadisticas = {
+            totalIngresos: ingresos.length,
+            montoInvertido: ingresos.reduce((acc, i) => acc + parseFloat(i.monto_total), 0),
+            cantidadProductos: ingresos.reduce((acc, i) => {
+                return acc + i.detalles.reduce((sum, d) => sum + d.cantidad, 0);
+            }, 0)
+        };
+
+        res.json({
+            ok: true,
+            estadisticas,
+            ingresos
+        });
+
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ ok: false, msg: 'Error al obtener ingresos' });
+    }
+}
+
 
 module.exports = {
     registroIngresoAdmin,
     obtenerIngresosAdmin,
     obtenerIngresoAdmin,
-    obtenerDocumentoIngreso
+    obtenerDocumentoIngreso,
+    reportIngresosAdmin
 }
