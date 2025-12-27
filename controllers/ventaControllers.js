@@ -6,6 +6,7 @@ const Producto = require('../models/Producto');
 const Banco = require('../models/Banco');
 const { Op, fn, col } = require('sequelize');
 const moment = require('moment');
+const Variedad = require('../models/Variedad');
 
 const crearVenta = async (req, res) => {
 
@@ -376,8 +377,22 @@ const obtenerVentaAdmin = async (req, res) => {
                     as: 'direccion'
                 },
                 {
+                    model: Banco,
+                    as: 'banco'
+                },
+                {
                     model: DetalleVenta,
                     as: 'detalles',
+                    include: [
+                        {
+                            model: Producto,
+                            as: 'producto' // Trae los valores del producto
+                        },
+                        {
+                            model: Variedad,
+                            as: 'variedad' // Trae la variedad (si existe)
+                        }
+                    ]
                 }
             ]
         });

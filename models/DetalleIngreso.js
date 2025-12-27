@@ -56,4 +56,10 @@ detalleIngreso.init({
 Ingreso.hasMany(detalleIngreso, { foreignKey: 'ingresoId', as: 'detalles' });
 detalleIngreso.belongsTo(Ingreso, { foreignKey: 'ingresoId', as: 'detalle_ingreso' });
 
+detalleIngreso.belongsTo(Producto, { foreignKey: 'productoId', as: 'producto' });
+Producto.hasMany(detalleIngreso, { foreignKey: 'productoId', as: 'detalles_ingreso' });
+
+detalleIngreso.belongsTo(Variedad, { foreignKey: 'variedadId', as: 'variedad' });
+Variedad.hasMany(detalleIngreso, { foreignKey: 'variedadId', as: 'detalles_ingreso' });
+
 module.exports = detalleIngreso;

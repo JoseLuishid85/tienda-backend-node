@@ -143,19 +143,22 @@ const obtenerIngresoAdmin = async (req, res) => {
             },
             include: [
                 {
+                    model: Proveedor,
+                    as: 'proveedorInfo',
+                },
+                {
                     model: DetalleIngreso,
                     as: 'detalles',
-                    /*
                     include: [
                         {
                             model: Producto,
-                            as: 'producto' // Usa el alias correcto
+                            as: 'producto' // Trae los valores del producto
                         },
                         {
                             model: Variedad,
-                            as: 'variedad' // Usa el alias correcto
+                            as: 'variedad' // Trae la variedad (si existe)
                         }
-                    ]*/
+                    ]
                 }
             ]
         });
@@ -282,12 +285,12 @@ const reportIngresosAdmin = async (req, res) => {
             include: [
                 { model: DetalleIngreso, as: 'detalles' },
                 { model: Proveedor, as: 'proveedorInfo', attributes: ['id', 'nombre', 'rif'] },
-               // { model: Usuario, as: 'usuario', attributes: ['nombres'] } 
+                // { model: Usuario, as: 'usuario', attributes: ['nombres'] } 
             ]
         });
 
         // --- CÁLCULO DE ESTADÍSTICAS ---
-        
+
         const estadisticas = {
             totalIngresos: ingresos.length,
             montoInvertido: ingresos.reduce((acc, i) => acc + parseFloat(i.monto_total), 0),

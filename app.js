@@ -20,7 +20,7 @@ sequelize.sync({ alter: false })
     })
     .catch(err => console.error('Error al sincronizar la BD:', err));
 
-//  app.use('/store/api/data/',  require('./routes/dataRouter.js'));
+app.use('/store/api/data/',  require('./routes/dataRouter.js'));
 
 app.use('/store/api/login', require('./routes/authRouter.js'));
 app.use('/store/api/usuario', require('./routes/usuario.js'));
@@ -38,6 +38,7 @@ app.use('/store/api/customer',  require('./routes/customerRouter.js'));
 app.use('/store/api/venta',  require('./routes/ventaRouter.js'));
 app.use('/store/api/detalleventa',  require('./routes/detalleventaRouter.js'));
 app.use('/store/api/banco',  require('./routes/bancoRouter.js'));
+app.use('/store/api/report',  require('./routes/reportRouter.js'));
 
 app.use(express.urlencoded({ extended: true }));
 

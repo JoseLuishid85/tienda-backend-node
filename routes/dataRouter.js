@@ -1,5 +1,5 @@
 const express = require('express');
-const {  crearDB } = require('../controllers/dataControllers.js');
+const {  crearDB, obtenerResumenAnual } = require('../controllers/dataControllers.js');
 
 
 const routes = express.Router();
