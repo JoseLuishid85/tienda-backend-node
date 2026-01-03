@@ -1,4 +1,6 @@
 const Venta = require('../models/Venta');
+const DetalleVenta = require('../models/DetalleVenta');
+const Producto = require('../models/Producto');
 const { Op } = require('sequelize');
 const sequelize = require('../config/database.js');
 
@@ -95,7 +97,80 @@ const obtenerResumenAnual = async (req, res) => {
     }
 }
 
+const obtenerProductosVendidosMes = async (req, res) => {
+
+    if (!req.usuario) {
+        res.status(500).json({
+            data: undefined,
+            msg: 'Error Token',
+            dd: req.usuario
+        });
+        return
+    }
+
+    try {
+        const { year, month } = req.query;
+
+        if (!year || !month) {
+            return res.status(400).send({ msg: "El año y el mes son requeridos" });
+        }
+
+        // Consultar los productos vendidos en el mes específico
+        const productosVendidos = await DetalleVenta.findAll({
+            attributes: [
+                'productoId',
+                [sequelize.fn('SUM', sequelize.col('DetalleVenta.cantidad')), 'cantidad_total']
+            ],
+            include: [
+                {
+                    model: Venta,
+                    as: 'venta',
+                    attributes: [],
+                    where: {
+                        year: parseInt(year),
+                        month: parseInt(month)
+                    }
+                },
+                {
+                    model: Producto,
+                    as: 'producto',
+                    attributes: ['id', 'titulo', 'slug', 'precio', 'portada', 'stock']
+                }
+            ],
+            group: ['productoId', 'producto.id'],
+            raw: false
+        });
+
+        // Formatear la respuesta
+        const productos = productosVendidos.map(item => ({
+            productoId: item.productoId,
+            titulo: item.producto.titulo,
+            slug: item.producto.slug,
+            precio: item.producto.precio,
+            portada: item.producto.portada,
+            stock_actual: item.producto.stock,
+            cantidad_vendida: parseInt(item.dataValues.cantidad_total)
+        }));
+
+        // Calcular totales
+        const totalUnidadesVendidas = productos.reduce((sum, item) => sum + item.cantidad_vendida, 0);
+
+        return res.status(200).send({
+            year: parseInt(year),
+            month: parseInt(month),
+            total_productos: productos.length,
+            total_unidades_vendidas: totalUnidadesVendidas,
+            productos
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({ msg: "Error al obtener productos vendidos del mes", error: error.message });
+    }
+}
+
 
 module.exports = {
-    obtenerResumenAnual
+    obtenerResumenAnual,
+    obtenerProductosVendidosMes
 }

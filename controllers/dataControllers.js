@@ -24,8 +24,8 @@ const crearDB = async (req, res) => {
     //await Variedad.sync();
     //await Galeria.sync();
     //await Proveedor.sync();
-    //await Ingreso.sync();
-    //await DetalleIngreso.sync();
+    await Ingreso.sync();
+    await DetalleIngreso.sync();
     //await Cliente.sync();
     //await Direccion.sync();
     //await Carrito.sync();
