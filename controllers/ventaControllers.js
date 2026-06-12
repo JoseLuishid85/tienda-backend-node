@@ -107,8 +107,10 @@ const getVentas = async (req, res) => {
     try {
         let ventas = await Venta.findAll({
             where: {
-                clienteId: req.cliente.id
+                clienteId: req.cliente.id,
+
             },
+            order: [['id', 'DESC']],
             include: [
                 {
                     model: Cliente,
@@ -415,6 +417,85 @@ const obtenerVentaAdmin = async (req, res) => {
     }
 }
 
+const cambiarEstadoVentaAdmin = async (req, res) => {
+
+    if (!req.usuario) {
+        res.status(500).json({
+            data: undefined,
+            msg: 'Error Token',
+            dd: req.usuario
+        });
+        return
+    }
+
+    let id = req.params['id'];
+    let estado = req.params['estado'];
+
+    try {
+        let venta = await Venta.findOne({
+            where: {
+                id: id
+            }
+        });
+
+        if (!venta) {
+            return res.status(404).json({
+                ok: false,
+                msg: 'La Venta no existe en la base de dato',
+            });
+        }
+
+        await Venta.update({
+            estado: estado,
+        }, {
+            where: { id: id }
+        });
+
+        let ventaProcesada = await Venta.findOne({
+            where: {
+                id: id
+            },
+            include: [
+                {
+                    model: Cliente,
+                    as: 'cliente',
+                },
+                {
+                    model: Direccion,
+                    as: 'direccion'
+                },
+                {
+                    model: Banco,
+                    as: 'banco'
+                },
+                {
+                    model: DetalleVenta,
+                    as: 'detalles',
+                    include: [
+                        {
+                            model: Producto,
+                            as: 'producto' // Trae los valores del producto
+                        },
+                        {
+                            model: Variedad,
+                            as: 'variedad' // Trae la variedad (si existe)
+                        }
+                    ]
+                }
+            ]
+        });
+
+        res.status(200).send(ventaProcesada);
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            message: 'Error al procesar datos',
+        })
+    }
+}
+
 const getVentasDiaAdmin = async (req, res) => {
 
     if (!req.usuario) {
@@ -490,43 +571,43 @@ const getReporteVentas = async (req, res) => {
                     };
                 }
                 break;
-            
-        case 'semana':
-            if (semana) {
-                // El formato de input "week" es "2024-W12"
-                const [year, weekNum] = semana.split('-W');
-                const startOfWeek = moment().year(year).isoWeek(weekNum).startOf('isoWeek');
-                const endOfWeek = moment().year(year).isoWeek(weekNum).endOf('isoWeek');
-                whereClause.createdAt = { [Op.between]: [startOfWeek.toDate(), endOfWeek.toDate()] };
-            }
-            break;
 
-        case 'mes':
-            if (mes && anioMes) {
-                const startOfMonth = moment(`${anioMes}-${mes}`, "YYYY-MM").startOf('month');
-                const endOfMonth = moment(`${anioMes}-${mes}`, "YYYY-MM").endOf('month');
-                whereClause.createdAt = { [Op.between]: [startOfMonth.toDate(), endOfMonth.toDate()] };
-            }
-            break;
+            case 'semana':
+                if (semana) {
+                    // El formato de input "week" es "2024-W12"
+                    const [year, weekNum] = semana.split('-W');
+                    const startOfWeek = moment().year(year).isoWeek(weekNum).startOf('isoWeek');
+                    const endOfWeek = moment().year(year).isoWeek(weekNum).endOf('isoWeek');
+                    whereClause.createdAt = { [Op.between]: [startOfWeek.toDate(), endOfWeek.toDate()] };
+                }
+                break;
 
-        case 'anio':
-            if (anio) {
-                const startOfYear = moment(anio, "YYYY").startOf('year');
-                const endOfYear = moment(anio, "YYYY").endOf('year');
-                whereClause.createdAt = { [Op.between]: [startOfYear.toDate(), endOfYear.toDate()] };
-            }
-            break;
+            case 'mes':
+                if (mes && anioMes) {
+                    const startOfMonth = moment(`${anioMes}-${mes}`, "YYYY-MM").startOf('month');
+                    const endOfMonth = moment(`${anioMes}-${mes}`, "YYYY-MM").endOf('month');
+                    whereClause.createdAt = { [Op.between]: [startOfMonth.toDate(), endOfMonth.toDate()] };
+                }
+                break;
 
-        case 'rango':
-            if (fechaInicio && fechaFin) {
-                whereClause.createdAt = {
-                    [Op.between]: [
-                        moment(fechaInicio).startOf('day').toDate(),
-                        moment(fechaFin).endOf('day').toDate()
-                    ]
-                };
-            }
-            break;
+            case 'anio':
+                if (anio) {
+                    const startOfYear = moment(anio, "YYYY").startOf('year');
+                    const endOfYear = moment(anio, "YYYY").endOf('year');
+                    whereClause.createdAt = { [Op.between]: [startOfYear.toDate(), endOfYear.toDate()] };
+                }
+                break;
+
+            case 'rango':
+                if (fechaInicio && fechaFin) {
+                    whereClause.createdAt = {
+                        [Op.between]: [
+                            moment(fechaInicio).startOf('day').toDate(),
+                            moment(fechaFin).endOf('day').toDate()
+                        ]
+                    };
+                }
+                break;
         }
 
         // 2. FILTROS ADICIONALES (Estado y Método de Pago)
@@ -573,6 +654,7 @@ module.exports = {
     obtenerVentaTransaccion,
     getVentasCliente,
     getVentasAdmin,
+    cambiarEstadoVentaAdmin,
     obtenerVentaAdmin,
     getVentasDiaAdmin,
     getReporteVentas
