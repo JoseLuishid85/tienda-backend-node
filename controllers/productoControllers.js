@@ -30,9 +30,9 @@ const registro_producto = async (req, res) => {
     let img_path = req.file.path;
     let str_img = img_path.split('\\');
     let str_portada = str_img[str_img.length - 1];
-    
+
     data.portada = str_portada;
-    data.slug = slugify(data.titulo).toLowerCase(); 
+    data.slug = slugify(data.titulo).toLowerCase();
 
     try {
         const producto = await Producto.create(data);
@@ -67,14 +67,14 @@ const getProductoAdmin = async (req, res) => {
 
     let producto = await Producto.findAll({
         where: whereCondition,
-        include:[
+        include: [
             {
                 model: Categoria,
-                as: 'categoria', 
+                as: 'categoria',
             },
             {
                 model: SubCategoria,
-                as: 'subCategoria', 
+                as: 'subCategoria',
             }
         ],
         order: [['createdAt', 'DESC']]
@@ -102,14 +102,14 @@ const obtenerProductoAdmin = async (req, res) => {
             where: {
                 id: id
             },
-            include:[
+            include: [
                 {
                     model: Categoria,
-                    as: 'categoria', 
+                    as: 'categoria',
                 },
                 {
                     model: SubCategoria,
-                    as: 'subCategoria', 
+                    as: 'subCategoria',
                 }
             ],
         });
@@ -169,7 +169,7 @@ const actualizar_producto = async (req, res) => {
             slug: data.slug,
             costo: data.costo,
             porcentaje_ganancia: data.porcentaje_ganancia,
-            precio: data.precio,   
+            precio: data.precio,
             extracto: data.extracto,
             talla: data.talla,
             color: data.color,
@@ -220,18 +220,18 @@ const listaProductoActivoAdmin = async (req, res) => {
         where: {
             estado: true
         },
-        include:[
+        include: [
             {
                 model: Categoria,
-                as: 'categoria', 
+                as: 'categoria',
             },
             {
                 model: SubCategoria,
-                as: 'subCategoria', 
+                as: 'subCategoria',
             },
             {
                 model: Variedad,
-                as: 'variedades', 
+                as: 'variedades',
             }
         ],
         order: [['createdAt', 'DESC']]
@@ -375,8 +375,8 @@ const eliminarGaleriaProductoAdmin = async (req, res) => {
         fs.unlinkSync(path_img);
         await galeria.destroy();
 
-        res.status(200).json({ 
-            msg:'Imagen eliminada',
+        res.status(200).json({
+            msg: 'Imagen eliminada',
             galeria
         });
     } catch (error) {
@@ -396,7 +396,7 @@ const actualizar_variedadProducto = async (req, res) => {
 
     const { id } = req.params; // Obtener el ID del producto a actualizar
     let data = req.body;
-    
+
 
     try {
 
@@ -424,36 +424,54 @@ const actualizar_variedadProducto = async (req, res) => {
     }
 };
 
-/*
-const subirImageProductoAdmin = async (req, res) =>{
+
+const actualizar_inventario_producto = async (req, res) => {
     if (!req.usuario) {
-        res.status(500).json({
+        return res.status(500).json({
             data: undefined,
             msg: 'Error Token',
             dd: req.usuario
         });
-        return
     }
 
-    let data = req.body;
+    const { id } = req.params;
+    const { stock, variedades } = req.body;
 
-    if (!req.files || req.files.length === 0) {
-        return res.status(400).json({ msg: 'No se subió ningún archivo' });
-    }
-    
-    let img_path = req.files[0].path;
-    let str_img = img_path.split('\\');
-    let str_imagen = str_img[str_img.length - 1];
-    
-    data.image = str_imagen; 
-    await Galeria.sync();
     try {
-        const galeria = await Galeria.create(data);
-        return res.status(200).send({ data: data });
+        const producto = await Producto.findByPk(id);
+
+        if (!producto) {
+            return res.status(404).json({ ok: false, msg: 'Producto no encontrado' });
+        }
+
+        const tieneVariedades = await Variedad.count({ where: { productoId: id } });
+
+        if (tieneVariedades > 0 && variedades && variedades.length > 0) {
+            for (const variedad of variedades) {
+                await Variedad.update(
+                    { stock: variedad.stock },
+                    { where: { id: variedad.id, productoId: id } }
+                );
+            }
+
+            const todasVariedades = await Variedad.findAll({ where: { productoId: id } });
+            const stockTotal = todasVariedades.reduce((sum, v) => sum + v.stock, 0);
+
+            await Producto.update({ stock: stockTotal }, { where: { id } });
+        } else {
+            await Producto.update({ stock }, { where: { id } });
+        }
+
+        const productoActualizado = await Producto.findByPk(id, {
+            include: [{ model: Variedad, as: 'variedades' }]
+        });
+
+        return res.status(200).json({ data: productoActualizado, msg: 'Inventario actualizado correctamente' });
     } catch (error) {
-        return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
+        console.error(error);
+        return res.status(500).json({ ok: false, msg: 'Error al procesar datos' });
     }
-}*/
+};
 
 module.exports = {
     registro_producto,
@@ -466,5 +484,6 @@ module.exports = {
     obtenerGaleriaProducto,
     obtenerGaleriaProductoAdmin,
     eliminarGaleriaProductoAdmin,
-    actualizar_variedadProducto
+    actualizar_variedadProducto,
+    actualizar_inventario_producto
 }

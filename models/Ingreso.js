@@ -11,7 +11,7 @@ Ingreso.init({
         primaryKey: true,
         autoIncrement: true
     },
-    proveedorId: { 
+    proveedorId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
@@ -26,7 +26,7 @@ Ingreso.init({
     },
     documento: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         defaultValue: 'Nada'
     },
     monto_total: {

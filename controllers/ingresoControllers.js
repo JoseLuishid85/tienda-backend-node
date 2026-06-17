@@ -23,9 +23,13 @@ const registroIngresoAdmin = async (req, res) => {
     let data = req.body;
     let detalles = JSON.parse(data.detalles);
 
-    let img_path = req.file.path;
-    let str_img = img_path.split('\\');
-    let str_documento = str_img[str_img.length - 1];
+    let str_documento = null;
+
+    if (req.file) {
+        let img_path = req.file.path;
+        let str_img = img_path.split(/[\\/]/);
+        str_documento = str_img[str_img.length - 1];
+    }
 
     data.documento = str_documento;
     data.usuarioId = req.usuario.id;
@@ -311,7 +315,6 @@ const reportIngresosAdmin = async (req, res) => {
         res.status(500).json({ ok: false, msg: 'Error al obtener ingresos' });
     }
 }
-
 
 module.exports = {
     registroIngresoAdmin,
