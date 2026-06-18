@@ -451,7 +451,9 @@ const cambiarEstadoVentaAdmin = async (req, res) => {
             where: { id: id }
         });
 
-        if (estado === 'En Proceso') {
+        const debeDescontarStock = venta.estado === 'Pendiente' && (estado === 'En Proceso' || estado === 'Entregado');
+
+        if (debeDescontarStock) {
             const detalles = await DetalleVenta.findAll({
                 where: { ventaId: id }
             });
