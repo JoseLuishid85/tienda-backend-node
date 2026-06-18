@@ -451,6 +451,26 @@ const cambiarEstadoVentaAdmin = async (req, res) => {
             where: { id: id }
         });
 
+        if (estado === 'En Proceso') {
+            const detalles = await DetalleVenta.findAll({
+                where: { ventaId: id }
+            });
+
+            for (const detalle of detalles) {
+                if (detalle.variedadId) {
+                    await Variedad.decrement('stock', {
+                        by: detalle.cantidad,
+                        where: { id: detalle.variedadId }
+                    });
+                }
+
+                await Producto.decrement('stock', {
+                    by: detalle.cantidad,
+                    where: { id: detalle.productoId }
+                });
+            }
+        }
+
         let ventaProcesada = await Venta.findOne({
             where: {
                 id: id
