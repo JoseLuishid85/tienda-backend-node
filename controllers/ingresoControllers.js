@@ -30,6 +30,7 @@ const registroIngresoAdmin = async (req, res) => {
         let str_img = img_path.split(/[\\/]/);
         str_documento = str_img[str_img.length - 1];
     }
+    //prueba
 
     data.documento = str_documento;
     data.usuarioId = req.usuario.id;
