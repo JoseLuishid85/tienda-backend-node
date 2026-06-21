@@ -7,6 +7,7 @@ function setupSocketIO(server) {
             methods: ["GET", "POST"]
         },
         //path: '/store/socket.io/',
+        path: '/valery/socket.io',
     });
 
     // Evento de conexión
