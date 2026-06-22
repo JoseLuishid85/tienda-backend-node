@@ -370,9 +370,9 @@ const eliminarGaleriaProductoAdmin = async (req, res) => {
             },
         });
 
-        let path_img = './uploads/galeria/' + galeria.image;
+        //let path_img = './uploads/galeria/' + galeria.image;
 
-        fs.unlinkSync(path_img);
+        //fs.unlinkSync(path_img);
         await galeria.destroy();
 
         res.status(200).json({

@@ -10,4 +10,4 @@ const generarClienteJWT = (userId) => {
 
 module.exports = {
     generarClienteJWT
-}
+} 
