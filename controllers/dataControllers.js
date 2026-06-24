@@ -17,18 +17,18 @@ const sequelize = require('../config/database.js');
 
 const crearDB = async (req, res) => {
 
-    await Usuario.sync();
-    await Categoria.sync();
-    await SubCategoria.sync();
-    await Producto.sync();
-    await Variedad.sync();
-    await Galeria.sync();
-    await Proveedor.sync();
-    await Ingreso.sync();
-    await DetalleIngreso.sync();
-    await Cliente.sync();
-    await Direccion.sync();
-    await Carrito.sync();
+    //await Usuario.sync();
+    //await Categoria.sync();
+    //await SubCategoria.sync();
+    //await Producto.sync();
+    //await Variedad.sync();
+    //await Galeria.sync();
+    //await Proveedor.sync();
+    //await Ingreso.sync();
+    //await DetalleIngreso.sync();
+    //await Cliente.sync();
+    //await Direccion.sync();
+    //await Carrito.sync();
     await Venta.sync();
     await DetalleVenta.sync();
 

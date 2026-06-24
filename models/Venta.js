@@ -4,7 +4,7 @@ const Cliente = require('./Cliente');
 const Direccion = require('./Direccion');
 const Banco = require('./Banco');
 
-class Venta extends Model {}
+class Venta extends Model { }
 
 Venta.init({
     id: {
@@ -44,6 +44,10 @@ Venta.init({
         type: DataTypes.FLOAT,
         allowNull: false
     },
+    total_pagado: {
+        type: DataTypes.FLOAT,
+        allowNull: true
+    },
     estado: {
         type: DataTypes.STRING,
         defaultValue: 'Pendiente',
@@ -80,7 +84,7 @@ Venta.init({
 }, {
     sequelize,
     modelName: 'Venta',
-    tableName: 'venta', 
+    tableName: 'venta',
     timestamps: true,
 });
 
