@@ -170,6 +170,7 @@ const actualizar_producto = async (req, res) => {
             costo: data.costo,
             porcentaje_ganancia: data.porcentaje_ganancia,
             precio: data.precio,
+            precio_oferta: data.precio_oferta,
             extracto: data.extracto,
             talla: data.talla,
             color: data.color,

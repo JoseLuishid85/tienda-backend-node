@@ -6,6 +6,7 @@ const {
     obtenerProductoSlug,
     getCategoriasPublico,
     obtenerProductoCategoria,
+    obtenerProductosOferta,
     getBancosPublico
 } = require('../controllers/publicoControllers.js');
 
@@ -15,6 +16,7 @@ routes.get('/obtener_productos_recomendado', obtenerProductosRecomendados);
 routes.get('/obtener_productos_shop', obtenerProductosShop);
 routes.get('/obtener_producto_slug/:slug', obtenerProductoSlug);
 routes.get('/obtener_productos_categoria/:categoriaId', obtenerProductoCategoria);
+routes.get('/obtener_productos_oferta', obtenerProductosOferta);
 routes.get('/lista_categorias', getCategoriasPublico);
 routes.get('/lista_bancos', getBancosPublico);
 

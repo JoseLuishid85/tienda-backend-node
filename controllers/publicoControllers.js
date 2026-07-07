@@ -176,6 +176,37 @@ const obtenerProductoCategoria = async (req, res) => {
     res.status(200).json(producto);
 }
 
+const obtenerProductosOferta = async (req, res) => {
+
+    let producto = await Producto.findAll({
+        where: {
+            estado: true,
+            descuento: true
+        },
+        include: [
+            {
+                model: Categoria,
+                as: 'categoria'
+            },
+            {
+                model: SubCategoria,
+                as: 'subCategoria'
+            },
+            {
+                model: Variedad,
+                as: 'variedades'
+            },
+            {
+                model: Galeria,
+                as: 'galerias'
+            }
+        ],
+        order: [['createdAt', 'DESC']],
+    });
+
+    res.status(200).json(producto);
+}
+
 const getBancosPublico = async (req, res) => {
 
     let bancos = await Banco.findAll({
@@ -200,5 +231,6 @@ module.exports = {
     getCategoriasPublico,
     obtenerProductoSlug,
     obtenerProductoCategoria,
+    obtenerProductosOferta,
     getBancosPublico
 }

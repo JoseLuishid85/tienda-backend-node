@@ -3,7 +3,7 @@ const sequelize = require('../config/database');
 const Categoria = require('./Categoria');
 const SubCategoria = require('./SubCategoria');
 
-class Producto extends Model {}
+class Producto extends Model { }
 
 Producto.init({
     id: {
@@ -19,21 +19,26 @@ Producto.init({
         type: DataTypes.STRING,
         allowNull: false
     },
-    costo:{
+    costo: {
         type: DataTypes.FLOAT,
         defaultValue: 0,
         allowNull: false
     },
-    porcentaje_ganancia:{
+    porcentaje_ganancia: {
         type: DataTypes.FLOAT,
         defaultValue: 0,
         allowNull: false
     },
     precio: {
-        type: DataTypes.FLOAT, 
+        type: DataTypes.FLOAT,
         defaultValue: 0,
         allowNull: false
-    },   
+    },
+    precio_oferta: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0,
+        allowNull: false
+    },
     extracto: {
         type: DataTypes.STRING,
         allowNull: false
@@ -65,18 +70,18 @@ Producto.init({
         type: DataTypes.BOOLEAN,
         allowNull: false
     },
-    stock:{
+    stock: {
         type: DataTypes.INTEGER,
         defaultValue: 0
     },
-    categoriaId: { 
+    categoriaId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
             model: Categoria,
             key: 'id'
         },
-        onDelete: 'CASCADE' 
+        onDelete: 'CASCADE'
     },
     subCategoriaId: {
         type: DataTypes.INTEGER,
@@ -85,7 +90,7 @@ Producto.init({
             model: SubCategoria,
             key: 'id'
         },
-        onDelete: 'CASCADE' 
+        onDelete: 'CASCADE'
     }
 }, {
     sequelize,
@@ -99,7 +104,7 @@ Categoria.hasMany(Producto, { foreignKey: 'categoriaId', as: 'productos' });
 
 Producto.belongsTo(SubCategoria, { foreignKey: 'subCategoriaId', as: 'subCategoria' });
 SubCategoria.hasMany(Producto, { foreignKey: 'subCategoriaId', as: 'productos' });
- 
+
 
 module.exports = Producto;
 
