@@ -28,6 +28,7 @@ app.use('/valery/api/categoria', require('./routes/categoriaRouter.js'));
 app.use('/valery/api/sub_categoria', require('./routes/subCategoriaRouter.js'));
 app.use('/valery/api/producto', require('./routes/productoRouter.js'));
 app.use('/valery/api/variedad', require('./routes/variedadRouter.js'));
+app.use('/valery/api/etiqueta', require('./routes/etiquetaRouter.js'));
 app.use('/valery/api/proveedor', require('./routes/proveedorRouter.js'));
 app.use('/valery/api/cliente', require('./routes/clienteRouter.js'));
 app.use('/valery/api/direccion', require('./routes/direccionRouter.js'));

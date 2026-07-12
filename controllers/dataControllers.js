@@ -12,6 +12,7 @@ const Direccion = require('../models/Direccion.js');
 const Carrito = require('../models/Carrito.js');
 const Venta = require('../models/Venta.js');
 const DetalleVenta = require('../models/DetalleVenta.js');
+const Etiqueta = require('../models/Etiqueta.js');
 const { Op } = require('sequelize');
 const sequelize = require('../config/database.js');
 
@@ -31,6 +32,7 @@ const crearDB = async (req, res) => {
     //await Carrito.sync();
     await Venta.sync();
     await DetalleVenta.sync();
+    await Etiqueta.sync();
 
     return res.status(200).send({ msg: "Todo bien" });
 

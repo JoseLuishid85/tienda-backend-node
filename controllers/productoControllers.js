@@ -8,6 +8,7 @@ const Producto = require('../models/Producto.js')
 const SubCategoria = require('../models/SubCategoria.js');
 const Galeria = require('../models/Galeria.js');
 const Variedad = require('../models/Variedad.js');
+const Etiqueta = require('../models/Etiqueta.js');
 
 const registro_producto = async (req, res) => {
 
@@ -344,6 +345,13 @@ const obtenerGaleriaProductoAdmin = async (req, res) => {
             where: {
                 productoId: id
             },
+            include: [
+                {
+                    model: Etiqueta,
+                    as: 'etiquetas',
+                    attributes: ['id', 'variedadId']
+                }
+            ]
         });
         return res.status(200).send({ data: galeria });
     } catch (error) {

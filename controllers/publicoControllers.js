@@ -3,7 +3,27 @@ const Categoria = require('../models/Categoria');
 const SubCategoria = require('../models/SubCategoria');
 const Variedad = require('../models/Variedad.js');
 const Galeria = require('../models/Galeria.js');
+const Etiqueta = require('../models/Etiqueta.js');
 const Banco = require('../models/Banco.js');
+
+const getGaleriaConEtiquetasInclude = () => ({
+    model: Galeria,
+    as: 'galerias',
+    include: [
+        {
+            model: Etiqueta,
+            as: 'etiquetas',
+            attributes: ['id', 'variedadId'],
+            include: [
+                {
+                    model: Variedad,
+                    as: 'variedad',
+                    attributes: ['id', 'talla', 'color', 'medida']
+                }
+            ]
+        }
+    ]
+});
 
 const obtenerNuevosProductos = async (req, res) => {
 
@@ -69,10 +89,7 @@ const obtenerProductosShop = async (req, res) => {
                 model: Variedad,
                 as: 'variedades'
             },
-            {
-                model: Galeria,
-                as: 'galerias'
-            }
+            getGaleriaConEtiquetasInclude()
         ],
         order: [['createdAt', 'DESC']],
     });
@@ -133,10 +150,7 @@ const obtenerProductoSlug = async (req, res) => {
                 model: Variedad,
                 as: 'variedades'
             },
-            {
-                model: Galeria,
-                as: 'galerias'
-            }
+            getGaleriaConEtiquetasInclude()
         ]
     });
 
@@ -165,10 +179,7 @@ const obtenerProductoCategoria = async (req, res) => {
                 model: Variedad,
                 as: 'variedades'
             },
-            {
-                model: Galeria,
-                as: 'galerias'
-            }
+            getGaleriaConEtiquetasInclude()
         ],
         limit: 6
     });
@@ -196,10 +207,7 @@ const obtenerProductosOferta = async (req, res) => {
                 model: Variedad,
                 as: 'variedades'
             },
-            {
-                model: Galeria,
-                as: 'galerias'
-            }
+            getGaleriaConEtiquetasInclude()
         ],
         order: [['createdAt', 'DESC']],
     });
