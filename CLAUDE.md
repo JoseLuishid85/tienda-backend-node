@@ -61,8 +61,9 @@ The app uses Sequelize with MySQL. Database credentials are in `.env`:
 
 ### API Routes
 
-All routes are prefixed with `/store/api/`:
+All routes are prefixed with `/valery/api/`:
 
+- `/data` - Misc data endpoints (dataRouter.js)
 - `/login` - Authentication (authRouter.js)
 - `/usuario` - User management
 - `/categoria`, `/sub_categoria` - Category management
@@ -76,6 +77,7 @@ All routes are prefixed with `/store/api/`:
 - `/customer` - Customer-specific routes
 - `/venta`, `/detalleventa` - Sales management
 - `/banco` - Bank accounts for payments
+- `/report` - Reporting endpoints (reportRouter.js)
 
 ### File Uploads
 

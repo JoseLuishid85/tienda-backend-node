@@ -12,6 +12,7 @@ const {
     subirImageProductoAdmin,
     obtenerGaleriaProducto,
     obtenerGaleriaProductoAdmin,
+    actualizarEstadoGaleriaProductoAdmin,
     eliminarGaleriaProductoAdmin,
     actualizar_variedadProducto,
     actualizar_inventario_producto
@@ -57,6 +58,7 @@ routes.get('/obtener_image_producto/:img', obtenerImageProducto);
 routes.post('/subir_imagen_producto_admin', [validarJWT, uploadGaleria.any()], subirImageProductoAdmin);
 routes.get('/obtener_galeria_producto/:img', obtenerGaleriaProducto);
 routes.get('/obtener_galeria_producto_admin/:id', validarJWT, obtenerGaleriaProductoAdmin);
+routes.put('/actualizar_estado_galeria_producto_admin/:id', validarJWT, actualizarEstadoGaleriaProductoAdmin);
 routes.delete('/eliminar_galeria_producto_admin/:id', validarJWT, eliminarGaleriaProductoAdmin);
 
 

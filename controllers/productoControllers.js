@@ -292,6 +292,7 @@ const subirImageProductoAdmin = async (req, res) => {
 
         let data = req.body;
         data.image = fileName;
+        data.estado = data.estado === 'Agotado' ? 'Agotado' : 'Activo';
 
         Galeria.sync()
             .then(() => Galeria.create(data))
@@ -345,6 +346,45 @@ const obtenerGaleriaProductoAdmin = async (req, res) => {
             },
         });
         return res.status(200).send({ data: galeria });
+    } catch (error) {
+        return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
+    }
+
+}
+
+const actualizarEstadoGaleriaProductoAdmin = async (req, res) => {
+
+    if (!req.usuario) {
+        res.status(500).json({
+            data: undefined,
+            msg: 'Error Token',
+            dd: req.usuario
+        });
+        return
+    }
+
+    let id = req.params['id'];
+    let estado = req.body.estado;
+
+    if (!['Activo', 'Agotado'].includes(estado)) {
+        return res.status(400).send({ msg: 'Estado no válido' });
+    }
+
+    try {
+        let galeria = await Galeria.findOne({
+            where: {
+                id: id
+            },
+        });
+
+        if (!galeria) {
+            return res.status(404).send({ msg: 'Imagen no encontrada' });
+        }
+
+        galeria.estado = estado;
+        await galeria.save();
+
+        return res.status(200).json({ data: galeria, msg: 'Estado actualizado' });
     } catch (error) {
         return res.status(500).send({ ok: false, data: undefined, msg: 'Error al procesar datos' });
     }
@@ -484,6 +524,7 @@ module.exports = {
     subirImageProductoAdmin,
     obtenerGaleriaProducto,
     obtenerGaleriaProductoAdmin,
+    actualizarEstadoGaleriaProductoAdmin,
     eliminarGaleriaProductoAdmin,
     actualizar_variedadProducto,
     actualizar_inventario_producto

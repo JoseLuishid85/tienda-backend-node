@@ -2,7 +2,7 @@ const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../config/database');
 const Producto = require('./Producto');
 
-class Galeria extends Model {}
+class Galeria extends Model { }
 
 Galeria.init({
     id: {
@@ -22,7 +22,11 @@ Galeria.init({
             key: 'id'
         },
         onDelete: 'CASCADE' // Si se borra una categoría, también sus subcategorías
-    }
+    },
+    estado: {
+        type: DataTypes.STRING(50),
+        allowNull: false
+    },
 }, {
     sequelize,
     modelName: 'Galeria',
