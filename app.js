@@ -12,8 +12,8 @@ app.use(cors());
 
 // Configurar Socket.IO
 setupSocketIO(server);
-
-//force: false alter: true
+     
+//force: false alter: true 
 sequelize.sync({ alter: false })
   .then(() => {
     console.log('Base de datos sincronizada dd.');
@@ -21,7 +21,6 @@ sequelize.sync({ alter: false })
   .catch(err => console.error('Error al sincronizar la BD:', err));
 
 app.use('/valery/api/data/', require('./routes/dataRouter.js'));
-
 app.use('/valery/api/login', require('./routes/authRouter.js'));
 app.use('/valery/api/usuario', require('./routes/usuario.js'));
 app.use('/valery/api/categoria', require('./routes/categoriaRouter.js'));
