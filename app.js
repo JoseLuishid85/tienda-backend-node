@@ -12,7 +12,7 @@ require('dotenv').config();
 app.use(express.json());
 app.use(cors());
 
-// Configurar Socket.IO
+// Configurar Socket.IO esto es una prueba
 setupSocketIO(server);
      
 //force: false alter: true 
@@ -22,6 +22,7 @@ sequelize.sync({ alter: false })
   })
   .catch(err => console.error('Error al sincronizar la BD:', err));
 
+  console.log(link)
 
 //app.use(`/${link}/api/data/`, require('./routes/dataRouter.js'));
 app.use(`/${link}/api/login`, require('./routes/authRouter.js'));
